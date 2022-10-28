@@ -2,7 +2,6 @@ package com.android.webapp.fragment;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,37 +28,28 @@ import im.delight.android.webview.AdvancedWebView;
 public class FragmentWebView extends Fragment {
 
     private static final String EXTRA_URL = "url";
-    private static final String EXTRA_SHARE = "share";
 
     private View mRootView;
     private CustomWebView mWebView;
     private String mUrl = "about:blank";
 
-    public static FragmentWebView newInstance(String url, String share) {
+    public static FragmentWebView newInstance(String url) {
         FragmentWebView fragment = new FragmentWebView();
-
         // arguments
         Bundle arguments = new Bundle();
         arguments.putString(EXTRA_URL, url);
-        arguments.putString(EXTRA_SHARE, share);
         fragment.setArguments(arguments);
 
         return fragment;
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // handle fragment arguments
         Bundle arguments = getArguments();
-        if (arguments != null) {
-            handleArguments(arguments);
+        if (arguments != null && arguments.containsKey(EXTRA_URL)) {
+            mUrl = arguments.getString(EXTRA_URL);
         }
     }
 
@@ -97,16 +87,6 @@ public class FragmentWebView extends Fragment {
             Toast.makeText(getActivity(), "global network offline", Toast.LENGTH_LONG).show();
         }
     }
-
-    private void handleArguments(Bundle arguments) {
-        if (arguments.containsKey(EXTRA_URL)) {
-            mUrl = arguments.getString(EXTRA_URL);
-        }
-        if (arguments.containsKey(EXTRA_SHARE)) {
-            //mShare = arguments.getString(ARGUMENT_SHARE);
-        }
-    }
-
 
     private void showContent(final long delay) {
         if (getActivity() != null && mRootView != null) {
