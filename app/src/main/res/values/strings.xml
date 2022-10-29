@@ -6,8 +6,12 @@
     <string name="title_saved">Saved</string>
     <string name="title_setting">Setting</string>
 
+    <string name="action_refresh">Refresh</string>
 
     <string name="app_deep_link_host" translatable="false">dream-space.web.id</string>
     <string name="app_deep_link_path" translatable="false">/.*</string>
+
+    <string name="empty_state_no_data">There are no data\nto show</string>
+    <string name="network_offline_msg">No Internet connection\nTap to retry</string>
 
 </resources>
