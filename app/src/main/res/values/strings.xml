@@ -14,4 +14,10 @@
     <string name="empty_state_no_data">There are no data\nto show</string>
     <string name="network_offline_msg">No Internet connection\nTap to retry</string>
 
+    <string name="permission_read_external_storage">Permission to read files is required</string>
+    <string name="permission_write_external_storage">Permission to write files is required</string>
+    <string name="permission_access_location">Permission to access your location is required</string>
+    <string name="permission_camera">Permission to access your camera is required</string>
+    <string name="permission_unknown">Permission is required</string>
+
 </resources>

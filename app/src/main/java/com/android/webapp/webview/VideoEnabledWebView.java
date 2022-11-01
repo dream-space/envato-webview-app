@@ -10,8 +10,6 @@ import android.webkit.WebChromeClient;
 
 import java.util.Map;
 
-import im.delight.android.webview.AdvancedWebView;
-
 
 /**
  * This class serves as a WebView to be used in conjunction with a VideoEnabledWebChromeClient.

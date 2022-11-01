@@ -21,9 +21,7 @@ public class AppConfig {
     public static final boolean SYSTEM_BAR_LIGHT = false;
     public static final String SYSTEM_BAR_COLOR = "#FF3700B3";
 
-    public static final boolean EXIT_CONFIRMATION = true;
     public static final boolean WEB_GEOLOCATION = true;
-    public static final boolean PROGRESS_PLACEHOLDER = true;
 
 
 }

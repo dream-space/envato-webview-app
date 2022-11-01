@@ -1,5 +1,6 @@
 package com.android.webapp.activity;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.webkit.CookieSyncManager;
+import android.webkit.GeolocationPermissions;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -27,13 +29,18 @@ import com.android.webapp.AppConfig;
 import com.android.webapp.R;
 import com.android.webapp.databinding.ActivityMainBinding;
 import com.android.webapp.utils.NetworkUtility;
+import com.android.webapp.utils.PermissionManager;
+import com.android.webapp.utils.PermissionRationaleHandler;
 import com.android.webapp.utils.ViewUtility;
 import com.android.webapp.webview.VideoEnabledWebChromeClient;
 import com.android.webapp.webview.VideoEnabledWebView;
 
+import java.util.Arrays;
+
 public class ActivityMain extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private PermissionManager mPermissionManager = new PermissionManager(new PermissionRationaleHandler());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,8 +94,7 @@ public class ActivityMain extends AppCompatActivity {
         binding.mainWebView.getSettings().setGeolocationEnabled(true);
         binding.mainWebView.getSettings().setSupportZoom(true);
         binding.mainWebView.getSettings().setBuiltInZoomControls(false);
-
-        binding.mainWebView.setGeolocationEnabled(true);
+        validateGeolocation();
 
         // webview chrome client
         View nonVideoLayout = binding.navigation;
@@ -100,6 +106,20 @@ public class ActivityMain extends AppCompatActivity {
                 super.onProgressChanged(view, progress);
                 binding.progressBar.setProgress(progress);
                 if (progress == 100) binding.progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
+                callback.invoke(origin, true, false);
+                validateGeolocation();
+                // check permissions
+                if (AppConfig.WEB_GEOLOCATION) {
+                    mPermissionManager.request(ActivityMain.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
+                            (requestable, permissionsResult) -> {
+                                binding.mainWebView.setGeolocationEnabled(permissionsResult.isGranted());
+                            }
+                    );
+                }
             }
         };
 
@@ -118,7 +138,7 @@ public class ActivityMain extends AppCompatActivity {
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             }
         });
-        binding.mainWebView.setWebChromeClient(webChromeClient);
+
 
         // web view style
         binding.mainWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY); // fixes scrollbar on Froyo
@@ -133,6 +153,8 @@ public class ActivityMain extends AppCompatActivity {
                 binding.swipeRefreshLayout.setEnabled(false);
             }
         });
+
+        binding.mainWebView.setWebChromeClient(webChromeClient);
 
         // on swipe list
         binding.swipeRefreshLayout.setOnRefreshListener(() -> reloadWebView());
@@ -152,13 +174,28 @@ public class ActivityMain extends AppCompatActivity {
         binding.swipeRefreshLayout.post(() -> binding.swipeRefreshLayout.setRefreshing(true));
     }
 
-
     private void showEmptyState(boolean show, String msg) {
         TextView failedText = (TextView) binding.lytFailed.findViewById(R.id.failed_text);
         failedText.setText(msg);
         binding.lytFailed.setVisibility(show ? View.VISIBLE : View.GONE);
         binding.mainWebView.setVisibility(show ? View.GONE : View.VISIBLE);
         (binding.lytFailed.findViewById(R.id.failed_retry)).setOnClickListener(view -> reloadWebView());
+    }
+
+    private void validateGeolocation() {
+        if (PermissionManager.check(this, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION).isGranted()) {
+            binding.mainWebView.setGeolocationEnabled(true);
+        } else {
+            binding.mainWebView.setGeolocationEnabled(false);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (Arrays.asList(permissions).contains(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            reloadWebView();
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
