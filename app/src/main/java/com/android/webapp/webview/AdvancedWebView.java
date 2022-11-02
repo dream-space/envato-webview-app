@@ -16,7 +16,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import java.util.HashMap;
 import android.net.http.SslError;
-import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
@@ -48,6 +47,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.webkit.WebView;
+
 import java.util.MissingResourceException;
 import java.util.Locale;
 import java.util.LinkedList;
@@ -1024,15 +1024,15 @@ public class AdvancedWebView extends WebView {
                 }
             }
 
-            @Override
-            public void onReachedMaxAppCacheSize(long requiredStorage, long quota, QuotaUpdater quotaUpdater) {
-                if (mCustomWebChromeClient != null) {
-                    mCustomWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-                }
-                else {
-                    super.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-                }
-            }
+//            @Override
+//            public void onReachedMaxAppCacheSize(long requiredStorage, long quota, QuotaUpdater quotaUpdater) {
+//                if (mCustomWebChromeClient != null) {
+//                    mCustomWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
+//                }
+//                else {
+//                    super.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
+//                }
+//            }
 
         });
 

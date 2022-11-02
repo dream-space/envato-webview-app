@@ -2,11 +2,14 @@ package com.android.webapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,19 +22,24 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.webapp.AppConfig;
 import com.android.webapp.R;
+import com.android.webapp.data.LoadingMode;
 import com.android.webapp.databinding.ActivityMainBinding;
+import com.android.webapp.utils.DownloadFileUtility;
 import com.android.webapp.utils.NetworkUtility;
 import com.android.webapp.utils.PermissionManager;
 import com.android.webapp.utils.PermissionRationaleHandler;
 import com.android.webapp.utils.ViewUtility;
+import com.android.webapp.webview.AdvancedWebView;
 import com.android.webapp.webview.VideoEnabledWebChromeClient;
 import com.android.webapp.webview.VideoEnabledWebView;
 
@@ -41,6 +49,12 @@ public class ActivityMain extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private PermissionManager mPermissionManager = new PermissionManager(new PermissionRationaleHandler());
+    private String lastDownloadUrl = "";
+    private boolean webviewSuccess = true;
+
+    private int mStoredActivityRequestCode;
+    private int mStoredActivityResultCode;
+    private Intent mStoredActivityResultIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +73,8 @@ public class ActivityMain extends AppCompatActivity {
 
     private void reloadWebView() {
         showLoading(true);
-        showEmptyState(false, "");
+        showEmptyState(false, R.drawable.ic_error, "");
+        binding.mainWebView.setVisibility(View.INVISIBLE);
         new Handler(this.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -75,14 +90,14 @@ public class ActivityMain extends AppCompatActivity {
         } else {
             showLoading(false);
             Toast.makeText(this, R.string.network_offline_msg, Toast.LENGTH_SHORT).show();
-            showEmptyState(true, getResources().getString(R.string.network_offline_msg));
+            showEmptyState(true, R.drawable.ic_offline, getString(R.string.network_offline_msg));
         }
     }
 
     private void initComponent() {
         ViewUtility.configureNavigation(this, binding.navigation);
-        binding.swipeRefreshLayout.setEnabled(AppConfig.SWIPE_REFRESH);
-        binding.progressBar.setEnabled(AppConfig.TOP_PROGRESS_BAR);
+        binding.swipeRefreshLayout.setEnabled((AppConfig.LOADING_MODE.equals(LoadingMode.ALL) || AppConfig.LOADING_MODE.equals(LoadingMode.SWIPE_ONLY)));
+        binding.progressBar.setEnabled((AppConfig.LOADING_MODE.equals(LoadingMode.ALL) || AppConfig.LOADING_MODE.equals(LoadingMode.TOP_BAR_ONLY)));
 
         // web view settings
         binding.mainWebView.getSettings().setJavaScriptEnabled(true);
@@ -155,10 +170,44 @@ public class ActivityMain extends AppCompatActivity {
         });
 
         binding.mainWebView.setWebChromeClient(webChromeClient);
+        binding.mainWebView.setListener(this, webViewListener);
 
         // on swipe list
         binding.swipeRefreshLayout.setOnRefreshListener(() -> reloadWebView());
     }
+
+    AdvancedWebView.Listener webViewListener = new AdvancedWebView.Listener() {
+        @Override
+        public void onPageStarted(String url, Bitmap favicon) {
+
+        }
+
+        @Override
+        public void onPageFinished(String url) {
+
+        }
+
+        @Override
+        public void onPageError(int errorCode, String description, String failingUrl) {
+
+        }
+
+        @Override
+        public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
+            mPermissionManager.request(ActivityMain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, new PermissionManager.PermissionAction<ActivityMain>() {
+                        @Override
+                        public void run(@NonNull ActivityMain requestable) {
+                            requestable.handleDownloadPermissionGranted(url, suggestedFilename, mimeType, userAgent);
+                        }
+                    }
+            );
+        }
+
+        @Override
+        public void onExternalPageRequest(String url) {
+
+        }
+    };
 
     private void showLoading(boolean loading) {
         swipeProgress(loading);
@@ -174,12 +223,15 @@ public class ActivityMain extends AppCompatActivity {
         binding.swipeRefreshLayout.post(() -> binding.swipeRefreshLayout.setRefreshing(true));
     }
 
-    private void showEmptyState(boolean show, String msg) {
+    private void showEmptyState(boolean show, @DrawableRes int icon, String msg) {
         TextView failedText = (TextView) binding.lytFailed.findViewById(R.id.failed_text);
-        failedText.setText(msg);
+        ImageView failedIcon = (ImageView) binding.lytFailed.findViewById(R.id.icon);
         binding.lytFailed.setVisibility(show ? View.VISIBLE : View.GONE);
         binding.mainWebView.setVisibility(show ? View.GONE : View.VISIBLE);
         (binding.lytFailed.findViewById(R.id.failed_retry)).setOnClickListener(view -> reloadWebView());
+        if (!show) return;
+        failedText.setText(msg);
+        failedIcon.setImageResource(icon);
     }
 
     private void validateGeolocation() {
@@ -190,12 +242,51 @@ public class ActivityMain extends AppCompatActivity {
         }
     }
 
+    private void handleDownloadPermissionGranted(String url, String suggestedFilename, String mimeType, String userAgent) {
+        Toast.makeText(this, R.string.main_downloading, Toast.LENGTH_LONG).show();
+        DownloadFileUtility.downloadFile(this, url, suggestedFilename, mimeType, userAgent);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (Arrays.asList(permissions).contains(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+        if (Arrays.asList(permissions).contains(Manifest.permission.ACCESS_COARSE_LOCATION) || Arrays.asList(permissions).contains(Manifest.permission.ACCESS_FINE_LOCATION)) {
             reloadWebView();
+        } else if (Arrays.asList(permissions).contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            // handle download file
+            webViewListener.onDownloadRequested(lastDownloadUrl, DownloadFileUtility.getFileName(lastDownloadUrl), null, 0, null, null);
+        } else if (Arrays.asList(permissions).contains(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            // handle upload file
+            if (mStoredActivityResultIntent != null) {
+                binding.mainWebView.onActivityResult(mStoredActivityRequestCode, mStoredActivityResultCode, mStoredActivityResultIntent);
+                mStoredActivityRequestCode = 0;
+                mStoredActivityResultCode = 0;
+                mStoredActivityResultIntent = null;
+            } else {
+                reloadWebView();
+            }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    // handle upload action
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        // check permissions
+        String[] permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+        PermissionManager.PermissionsResult result = PermissionManager.check(this, permissions);
+
+        if (result.isGranted()) {
+            // permitted
+            binding.mainWebView.onActivityResult(requestCode, resultCode, intent);
+        } else {
+            // not permitted
+            mStoredActivityRequestCode = requestCode;
+            mStoredActivityResultCode = resultCode;
+            mStoredActivityResultIntent = intent;
+            mPermissionManager.request(ActivityMain.this, Manifest.permission.READ_EXTERNAL_STORAGE, requestable -> {});
+        }
     }
 
     @Override
@@ -239,18 +330,25 @@ public class ActivityMain extends AppCompatActivity {
 
         @Override
         public void onPageFinished(final WebView view, final String url) {
-            binding.mainWebView.setVisibility(View.VISIBLE); // hide progress bar with delay to show webview content smoothly
-            CookieSyncManager.getInstance().sync(); // save cookies
-            showLoading(false);
-            if (AppConfig.TOOLBAR_WEB_TITLE) {
-                binding.toolbar.setTitle(view.getTitle());
+            if (webviewSuccess) {
+                binding.mainWebView.setVisibility(View.VISIBLE);
+                CookieSyncManager.getInstance().sync();
+                showLoading(false);
+                showEmptyState(false, R.drawable.ic_error, "");
+                if (AppConfig.TOOLBAR_WEB_TITLE) {
+                    binding.toolbar.setTitle(view.getTitle());
+                }
+            } else {
+                binding.mainWebView.setVisibility(View.INVISIBLE);
             }
         }
 
         @Override
         public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
-            binding.mainWebView.setVisibility(View.INVISIBLE);
+            webviewSuccess = false;
+            binding.mainWebView.setVisibility(View.GONE);
             showLoading(false);
+            showEmptyState(true, R.drawable.ic_error, getString(R.string.general_error_msg));
         }
 
         @TargetApi(Build.VERSION_CODES.M)
@@ -258,12 +356,16 @@ public class ActivityMain extends AppCompatActivity {
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
             // forward to deprecated method
             onReceivedError(view, error.getErrorCode(), error.getDescription().toString(), request.getUrl().toString());
-            showLoading(false);
         }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+            webviewSuccess = true;
+            if (DownloadFileUtility.isDownloadableFile(url)) {
+                lastDownloadUrl = url;
+                webViewListener.onDownloadRequested(url, DownloadFileUtility.getFileName(url), null, 0, null, null);
+                return true;
+            } else if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
 
                 // determine for opening the link externally or internally
 //                boolean external = isLinkExternal(url);
