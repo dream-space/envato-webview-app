@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WebApp</string>
+    <string name="app_name">WebView App</string>
 
     <string name="title_home">Home</string>
     <string name="title_option">Option</string>
@@ -21,5 +21,8 @@
     <string name="permission_unknown">Permission is required</string>
 
     <string name="main_downloading">Downloading…</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
 </resources>

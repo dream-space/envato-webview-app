@@ -9,9 +9,9 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -28,22 +28,27 @@ import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 
 import com.android.webapp.AppConfig;
 import com.android.webapp.R;
 import com.android.webapp.data.LoadingMode;
+import com.android.webapp.data.ToolbarTitleMode;
 import com.android.webapp.databinding.ActivityMainBinding;
-import com.android.webapp.utils.DownloadFileUtility;
-import com.android.webapp.utils.NetworkUtility;
+import com.android.webapp.model.DrawerMenuItem;
 import com.android.webapp.utils.PermissionManager;
 import com.android.webapp.utils.PermissionRationaleHandler;
-import com.android.webapp.utils.ViewUtility;
+import com.android.webapp.utils.Tools;
 import com.android.webapp.webview.AdvancedWebView;
 import com.android.webapp.webview.VideoEnabledWebChromeClient;
 import com.android.webapp.webview.VideoEnabledWebView;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActivityMain extends AppCompatActivity {
 
@@ -51,6 +56,8 @@ public class ActivityMain extends AppCompatActivity {
     private PermissionManager mPermissionManager = new PermissionManager(new PermissionRationaleHandler());
     private String lastDownloadUrl = "";
     private boolean webviewSuccess = true;
+    private ActionBar actionBar;
+    private Map<Integer, DrawerMenuItem> menuMap;
 
     private int mStoredActivityRequestCode;
     private int mStoredActivityResultCode;
@@ -63,12 +70,17 @@ public class ActivityMain extends AppCompatActivity {
         setContentView(binding.getRoot());
         initComponent();
         initToolbar();
-        loadWebView(AppConfig.HOME_URL);
+        setupNavigationDrawer();
+
+        // load default menu page
+        DrawerMenuItem firstMenu = menuMap.get(AppConfig.DEFAULT_MENU_ID);
+        if (firstMenu != null) onNavigationItemSelected(firstMenu);
     }
 
     private void initToolbar() {
         setSupportActionBar(binding.toolbar);
-        ViewUtility.configureToolbar(this, binding.appBarLayout, binding.toolbar);
+        actionBar = getSupportActionBar();
+        Tools.configureToolbar(this, binding.appBarLayout, binding.toolbar);
     }
 
     private void reloadWebView() {
@@ -84,18 +96,19 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void loadWebView(String url) {
-        if (NetworkUtility.isOnline(this)) {
+        webviewSuccess = true;
+        if (Tools.isOnline(this)) {
             showLoading(true);
             binding.mainWebView.loadUrl(url);
         } else {
             showLoading(false);
             Toast.makeText(this, R.string.network_offline_msg, Toast.LENGTH_SHORT).show();
-            showEmptyState(true, R.drawable.ic_offline, getString(R.string.network_offline_msg));
+            showEmptyState(true, R.drawable.ic_no_internet, getString(R.string.network_offline_msg));
         }
     }
 
     private void initComponent() {
-        ViewUtility.configureNavigation(this, binding.navigation);
+        Tools.configureNavigation(this, binding.navigation);
         binding.swipeRefreshLayout.setEnabled((AppConfig.LOADING_MODE.equals(LoadingMode.ALL) || AppConfig.LOADING_MODE.equals(LoadingMode.SWIPE_ONLY)));
         binding.progressBar.setEnabled((AppConfig.LOADING_MODE.equals(LoadingMode.ALL) || AppConfig.LOADING_MODE.equals(LoadingMode.TOP_BAR_ONLY)));
 
@@ -154,12 +167,11 @@ public class ActivityMain extends AppCompatActivity {
             }
         });
 
-
         // web view style
         binding.mainWebView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY); // fixes scrollbar on Froyo
         binding.mainWebView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         binding.mainWebView.setWebViewClient(new CustomWebViewClient());
-        binding.mainWebView.requestFocus(View.FOCUS_DOWN); // http://android24hours.blogspot.cz/2011/12/android-soft-keyboard-not-showing-on.html
+        binding.mainWebView.requestFocus(View.FOCUS_DOWN);
 
         binding.mainWebView.getViewTreeObserver().addOnScrollChangedListener(() -> {
             if (binding.mainWebView.getScrollY() == 0) {
@@ -174,6 +186,40 @@ public class ActivityMain extends AppCompatActivity {
 
         // on swipe list
         binding.swipeRefreshLayout.setOnRefreshListener(() -> reloadWebView());
+
+    }
+
+    private void setupNavigationDrawer() {
+        Menu menu = binding.navigation.getMenu();
+        menuMap = new HashMap<>();
+        for (DrawerMenuItem d : AppConfig.DRAWER_MENU) {
+            menu.add(0, d.id, Menu.NONE, d.title).setIcon(d.icon);
+            menuMap.put(d.id, d);
+        }
+        SubMenu subMenu = menu.addSubMenu(AppConfig.DRAWER_SUBMENU_TITLE);
+        for (DrawerMenuItem d : AppConfig.DRAWER_SUBMENU) {
+            subMenu.add(0, d.id, Menu.NONE, d.title).setIcon(d.icon);
+            menuMap.put(d.id, d);
+        }
+        binding.navigation.invalidate();
+        // navigation listener
+        binding.navigation.setNavigationItemSelectedListener(item -> {
+            DrawerMenuItem selectedMenu = menuMap.get(item.getItemId());
+            onNavigationItemSelected(selectedMenu);
+            return true;
+        });
+
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_open);
+        binding.drawerLayout.addDrawerListener(mDrawerToggle);
+        mDrawerToggle.syncState();
+    }
+
+    private void onNavigationItemSelected(DrawerMenuItem item) {
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
+        loadWebView(item.url);
+        if (AppConfig.TOOLBAR_TITLE_MODE == ToolbarTitleMode.DRAWER_TITLE_MENU) {
+            actionBar.setTitle(item.title);
+        }
     }
 
     AdvancedWebView.Listener webViewListener = new AdvancedWebView.Listener() {
@@ -244,7 +290,7 @@ public class ActivityMain extends AppCompatActivity {
 
     private void handleDownloadPermissionGranted(String url, String suggestedFilename, String mimeType, String userAgent) {
         Toast.makeText(this, R.string.main_downloading, Toast.LENGTH_LONG).show();
-        DownloadFileUtility.downloadFile(this, url, suggestedFilename, mimeType, userAgent);
+        Tools.downloadFile(this, url, suggestedFilename, mimeType, userAgent);
     }
 
     @Override
@@ -253,7 +299,7 @@ public class ActivityMain extends AppCompatActivity {
             reloadWebView();
         } else if (Arrays.asList(permissions).contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             // handle download file
-            webViewListener.onDownloadRequested(lastDownloadUrl, DownloadFileUtility.getFileName(lastDownloadUrl), null, 0, null, null);
+            webViewListener.onDownloadRequested(lastDownloadUrl, Tools.getFileName(lastDownloadUrl), null, 0, null, null);
         } else if (Arrays.asList(permissions).contains(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             // handle upload file
             if (mStoredActivityResultIntent != null) {
@@ -285,7 +331,8 @@ public class ActivityMain extends AppCompatActivity {
             mStoredActivityRequestCode = requestCode;
             mStoredActivityResultCode = resultCode;
             mStoredActivityResultIntent = intent;
-            mPermissionManager.request(ActivityMain.this, Manifest.permission.READ_EXTERNAL_STORAGE, requestable -> {});
+            mPermissionManager.request(ActivityMain.this, Manifest.permission.READ_EXTERNAL_STORAGE, requestable -> {
+            });
         }
     }
 
@@ -312,7 +359,7 @@ public class ActivityMain extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_activity_main, menu);
         menu.findItem(R.id.action_refresh).setVisible(AppConfig.TOOLBAR_REFRESH);
-        ViewUtility.changeMenuIconColor(menu, Color.parseColor(AppConfig.TOOLBAR_TEXT_ICON_COLOR));
+        Tools.changeMenuIconColor(menu, Color.parseColor(AppConfig.TOOLBAR_TEXT_ICON_COLOR));
         return true;
     }
 
@@ -335,8 +382,8 @@ public class ActivityMain extends AppCompatActivity {
                 CookieSyncManager.getInstance().sync();
                 showLoading(false);
                 showEmptyState(false, R.drawable.ic_error, "");
-                if (AppConfig.TOOLBAR_WEB_TITLE) {
-                    binding.toolbar.setTitle(view.getTitle());
+                if (AppConfig.TOOLBAR_TITLE_MODE == ToolbarTitleMode.FROM_WEB) {
+                    actionBar.setTitle(view.getTitle());
                 }
             } else {
                 binding.mainWebView.setVisibility(View.INVISIBLE);
@@ -360,23 +407,21 @@ public class ActivityMain extends AppCompatActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            webviewSuccess = true;
-            if (DownloadFileUtility.isDownloadableFile(url)) {
+            if (Tools.isDownloadableFile(url)) {
                 lastDownloadUrl = url;
-                webViewListener.onDownloadRequested(url, DownloadFileUtility.getFileName(url), null, 0, null, null);
+                webViewListener.onDownloadRequested(url, Tools.getFileName(url), null, 0, null, null);
                 return true;
             } else if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
 
-                // determine for opening the link externally or internally
-//                boolean external = isLinkExternal(url);
-//                boolean internal = isLinkInternal(url);
-//                if (!external && !internal) {
-//                    external = WebViewAppConfig.OPEN_LINKS_IN_EXTERNAL_BROWSER;
-//                }
+                boolean external = isLinkExternal(url);
+                boolean internal = isLinkInternal(url);
+                if (!external && !internal) {
+                    external = AppConfig.OPEN_LINKS_IN_EXTERNAL_BROWSER;
+                }
 
                 // open the link
-                if (false) {
-                    // IntentUtility.startWebActivity(getContext(), url);
+                if (external) {
+                    Tools.startWebActivity(ActivityMain.this, url);
                     return true;
                 } else {
                     showLoading(true);
@@ -387,9 +432,22 @@ public class ActivityMain extends AppCompatActivity {
                 // ((LoadUrlListener) getActivity()).onLoadUrl(url);
                 return false;
             } else {
-                // return IntentUtility.startIntentActivity(getContext(), url);
-                return false;
+                return Tools.startIntentActivity(ActivityMain.this, url);
             }
         }
+    }
+
+    private boolean isLinkExternal(String url) {
+        for (String rule : AppConfig.LINKS_OPENED_IN_EXTERNAL_BROWSER) {
+            if (url.contains(rule)) return true;
+        }
+        return false;
+    }
+
+    private boolean isLinkInternal(String url) {
+        for (String rule : AppConfig.LINKS_OPENED_IN_INTERNAL_WEBVIEW) {
+            if (url.contains(rule)) return true;
+        }
+        return false;
     }
 }
