@@ -98,14 +98,8 @@ public class ActivityMain extends AppCompatActivity {
 
     private void loadWebView(String url) {
         webviewSuccess = true;
-        if (Tools.isOnline(this)) {
-            showLoading(true);
-            binding.mainWebView.loadUrl(url);
-        } else {
-            showLoading(false);
-            Toast.makeText(this, R.string.network_offline_msg, Toast.LENGTH_SHORT).show();
-            showEmptyState(true, R.drawable.ic_no_internet, getString(R.string.network_offline_msg));
-        }
+        showLoading(true);
+        binding.mainWebView.loadUrl(url);
     }
 
     private void initComponent() {
@@ -393,6 +387,11 @@ public class ActivityMain extends AppCompatActivity {
                 }
             } else {
                 binding.mainWebView.setVisibility(View.INVISIBLE);
+                if (!Tools.isOnline(ActivityMain.this)) {
+                    showLoading(false);
+                    Toast.makeText(ActivityMain.this, R.string.network_offline_msg, Toast.LENGTH_SHORT).show();
+                    showEmptyState(true, R.drawable.ic_no_internet, getString(R.string.network_offline_msg));
+                }
             }
         }
 

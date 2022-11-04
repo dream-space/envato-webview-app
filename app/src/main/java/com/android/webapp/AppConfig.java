@@ -10,7 +10,7 @@ public class AppConfig {
     public static final DrawerMenuItem[] DRAWER_MENU = {
             new DrawerMenuItem(100, R.drawable.ic_home, "Home", "https://demo.dream-space.web.id/webview/"),
             new DrawerMenuItem(200, R.drawable.ic_produts, "Product", "https://codecanyon.net/user/dream_space/portfolio?order_by=sales"),
-            new DrawerMenuItem(300, R.drawable.ic_offline, "Offline", "https://google.com"),
+            new DrawerMenuItem(300, R.drawable.ic_offline, "Offline", "file:///android_asset/about.html"),
             new DrawerMenuItem(400, R.drawable.ic_video, "Videos", "https://youtube.com")
     };
 
@@ -18,8 +18,8 @@ public class AppConfig {
 
     public static final DrawerMenuItem[] DRAWER_SUBMENU = {
             new DrawerMenuItem(500, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/developer?id=Dream+Space"),
-            new DrawerMenuItem(600, R.drawable.ic_privacy, "Privacy Policy", "https://mock.robotemplates.com/webviewapp/home.html"),
-            new DrawerMenuItem(700, R.drawable.ic_about, "About", "https://mock.robotemplates.com/webviewapp/home.html")
+            new DrawerMenuItem(600, R.drawable.ic_privacy, "Privacy", "https://dream-space.web.id/privacy-policy"),
+            new DrawerMenuItem(700, R.drawable.ic_about, "About", "file:///android_asset/about.html")
     };
 
     public static final LoadingMode LOADING_MODE = LoadingMode.ALL;
@@ -43,7 +43,6 @@ public class AppConfig {
             ".*mp3$", ".*wav$",
             ".*mp4$", ".*mpg$",
             ".*drive.google.com.*file.*",
-            ".*dropbox.com/s/.*"
     };
 
     public static final boolean OPEN_ALL_LINKS_EXTERNALLY = false;
