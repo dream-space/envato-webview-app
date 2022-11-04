@@ -40,14 +40,16 @@ public class Tools {
     public static void configureToolbar(AppCompatActivity act, AppBarLayout appBarLayout, Toolbar toolbar) {
         ActionBar bar = act.getSupportActionBar();
         bar.setDisplayUseLogoEnabled(false);
-        bar.setDisplayShowTitleEnabled(AppConfig.TOOLBAR_TITLE_MODE != ToolbarTitleMode.DISABLED);
-        bar.setDisplayShowHomeEnabled(true);
+        bar.setDisplayShowTitleEnabled(AppConfig.TOOLBAR_TITLE_MODE != ToolbarTitleMode.DISABLE);
+        bar.setDisplayShowHomeEnabled(false);
         bar.setDisplayHomeAsUpEnabled(AppConfig.SHOW_DRAWER_NAVIGATION);
         bar.setHomeButtonEnabled(AppConfig.SHOW_DRAWER_NAVIGATION);
-        appBarLayout.setVisibility(AppConfig.TOOLBAR ? View.VISIBLE : View.GONE);
+
+        if(!AppConfig.TOOLBAR) bar.hide();
         if (AppConfig.SYSTEM_BAR_LIGHT) setSystemBarLight(act);
         toolbar.setBackgroundColor(Color.parseColor(AppConfig.TOOLBAR_COLOR));
         toolbar.setTitleTextColor(Color.parseColor(AppConfig.TOOLBAR_TEXT_ICON_COLOR));
+        appBarLayout.setBackgroundColor(Color.parseColor(AppConfig.TOOLBAR_COLOR));
     }
 
     public static void configureNavigation(Activity act, View navigationView) {
@@ -198,18 +200,6 @@ public class Tools {
         return networkInfo != null && networkInfo.isAvailable() && networkInfo.isConnected();
     }
 
-    public static int getType(@NonNull Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null ? networkInfo.getType() : -1;
-    }
-
-    public static String getTypeName(@NonNull Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService("connectivity");
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null ? networkInfo.getTypeName() : null;
-    }
-
     public static void downloadFile(@NonNull Context context, @NonNull String url, @NonNull String suggestedFilename, @Nullable String mimeType, @Nullable String userAgent) {
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
 
@@ -240,7 +230,7 @@ public class Tools {
     public static boolean isDownloadableFile(String url) {
         url = url.toLowerCase();
 
-        for (String type : AppConfig.DOWNLOAD_FILE_TYPES) {
+        for (String type : AppConfig.DOWNLOAD_FILE_EXT) {
             if (url.matches(type)) return true;
         }
 

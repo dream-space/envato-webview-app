@@ -32,6 +32,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.android.webapp.AppConfig;
 import com.android.webapp.R;
@@ -209,9 +210,14 @@ public class ActivityMain extends AppCompatActivity {
             return true;
         });
 
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_open);
-        binding.drawerLayout.addDrawerListener(mDrawerToggle);
-        mDrawerToggle.syncState();
+        if (!AppConfig.SHOW_DRAWER_NAVIGATION) {
+            binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
+        } else {
+            ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.drawer_open, R.string.drawer_open);
+            binding.drawerLayout.addDrawerListener(mDrawerToggle);
+            mDrawerToggle.syncState();
+            binding.toolbar.setContentInsetStartWithNavigation(0);
+        }
     }
 
     private void onNavigationItemSelected(DrawerMenuItem item) {
@@ -358,7 +364,7 @@ public class ActivityMain extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_activity_main, menu);
-        menu.findItem(R.id.action_refresh).setVisible(AppConfig.TOOLBAR_REFRESH);
+        menu.findItem(R.id.action_refresh).setVisible(AppConfig.TOOLBAR_REFRESH_BUTTON);
         Tools.changeMenuIconColor(menu, Color.parseColor(AppConfig.TOOLBAR_TEXT_ICON_COLOR));
         return true;
     }
@@ -416,7 +422,7 @@ public class ActivityMain extends AppCompatActivity {
                 boolean external = isLinkExternal(url);
                 boolean internal = isLinkInternal(url);
                 if (!external && !internal) {
-                    external = AppConfig.OPEN_LINKS_IN_EXTERNAL_BROWSER;
+                    external = AppConfig.OPEN_ALL_LINKS_EXTERNALLY;
                 }
 
                 // open the link
@@ -438,14 +444,14 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private boolean isLinkExternal(String url) {
-        for (String rule : AppConfig.LINKS_OPENED_IN_EXTERNAL_BROWSER) {
+        for (String rule : AppConfig.LINKS_OPEN_EXTERNALLY) {
             if (url.contains(rule)) return true;
         }
         return false;
     }
 
     private boolean isLinkInternal(String url) {
-        for (String rule : AppConfig.LINKS_OPENED_IN_INTERNAL_WEBVIEW) {
+        for (String rule : AppConfig.LINKS_OPEN_INTERNALLY) {
             if (url.contains(rule)) return true;
         }
         return false;

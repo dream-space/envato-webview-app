@@ -3,9 +3,6 @@ import com.android.webapp.data.LoadingMode;
 import com.android.webapp.data.ToolbarTitleMode;
 import com.android.webapp.model.DrawerMenuItem;
 
-import static com.android.webapp.data.LoadingMode.*;
-import static com.android.webapp.data.ToolbarTitleMode.*;
-
 public class AppConfig {
 
     public static final int DEFAULT_MENU_ID = 100;
@@ -25,15 +22,15 @@ public class AppConfig {
             new DrawerMenuItem(700, R.drawable.ic_about, "About", "https://mock.robotemplates.com/webviewapp/home.html")
     };
 
-    public static final LoadingMode LOADING_MODE = ALL;
-    public static final boolean TOOLBAR_REFRESH = true;
-
+    public static final LoadingMode LOADING_MODE = LoadingMode.ALL;
     public static final boolean SHOW_DRAWER_NAVIGATION = true;
 
     public static final boolean TOOLBAR = true;
-    public static final ToolbarTitleMode TOOLBAR_TITLE_MODE = DRAWER_TITLE_MENU;
+    public static final boolean TOOLBAR_REFRESH_BUTTON = true;
+    public static final ToolbarTitleMode TOOLBAR_TITLE_MODE = ToolbarTitleMode.DRAWER_TITLE_MENU;
 
-    public static final String TOOLBAR_COLOR = "#FF6200EE";
+    // https://www.google.com/search?q=hex+color+picker
+    public static final String TOOLBAR_COLOR = "#6200EE";
 
     public static final String TOOLBAR_TEXT_ICON_COLOR = "#FFFFFF";
 
@@ -41,28 +38,24 @@ public class AppConfig {
 
     public static final boolean WEB_GEOLOCATION = true;
 
-    public static final String[] DOWNLOAD_FILE_TYPES = {
-            ".*zip$", ".*rar$", ".*pdf$", ".*doc$", ".*xls$",
-            ".*mp3$", ".*wma$", ".*ogg$", ".*m4a$", ".*wav$",
-            ".*avi$", ".*mov$", ".*mp4$", ".*mpg$", ".*3gp$",
+    public static final String[] DOWNLOAD_FILE_EXT = {
+            ".*zip$", ".*rar$", ".*pdf$",
+            ".*mp3$", ".*wav$",
+            ".*mp4$", ".*mpg$",
             ".*drive.google.com.*file.*",
             ".*dropbox.com/s/.*"
     };
 
-    public static final boolean OPEN_LINKS_IN_EXTERNAL_BROWSER = false;
+    public static final boolean OPEN_ALL_LINKS_EXTERNALLY = false;
 
-    public static final String[] LINKS_OPENED_IN_EXTERNAL_BROWSER = {
-            "target=blank",
+    public static final String[] LINKS_OPEN_EXTERNALLY = {
             "target=external",
             "play.google.com/store",
-            "youtube.com/watch",
-            "facebook.com/sharer",
-            "twitter.com/share",
+            "wa.me",
             "t.me"
     };
 
-    public static final String[] LINKS_OPENED_IN_INTERNAL_WEBVIEW = {
-            "target=webview",
+    public static final String[] LINKS_OPEN_INTERNALLY = {
             "target=internal"
     };
 

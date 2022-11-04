@@ -30,14 +30,12 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="?android:attr/actionBarSize">
+                    android:layout_height="wrap_content">
 
                     <androidx.appcompat.widget.Toolbar
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:contentInsetStart="0dp"
-                        app:contentInsetStartWithNavigation="0dp" />
+                        android:layout_height="wrap_content" />
 
                     <ProgressBar
                         android:id="@+id/progress_bar"
