@@ -2,6 +2,8 @@ package com.android.webapp.utils;
 
 import static android.content.Context.DOWNLOAD_SERVICE;
 
+import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
+
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
@@ -17,11 +19,13 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.widget.ImageView;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
@@ -35,6 +39,8 @@ import com.android.webapp.BuildConfig;
 import com.android.webapp.R;
 import com.android.webapp.data.ThisApp;
 import com.android.webapp.data.ToolbarTitleMode;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.snackbar.Snackbar;
@@ -45,6 +51,9 @@ import com.google.android.play.core.install.InstallStateUpdatedListener;
 import com.google.android.play.core.install.model.AppUpdateType;
 import com.google.android.play.core.install.model.InstallStatus;
 import com.google.android.play.core.install.model.UpdateAvailability;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Tools {
 
@@ -302,4 +311,32 @@ public class Tools {
             }
         });
     }
+
+    public static void displayImage(Context ctx, ImageView img, String url) {
+        try {
+            Glide.with(ctx.getApplicationContext()).load(url)
+                    .transition(withCrossFade())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(img);
+        } catch (Exception e) {
+            Log.e("tag", "error img => " + e.getMessage());
+        }
+    }
+
+    public static void displayImageThumb(Context ctx, ImageView img, String url, float thumb) {
+        try {
+            Glide.with(ctx.getApplicationContext()).load(url)
+                    .transition(withCrossFade())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .thumbnail(thumb)
+                    .into(img);
+        } catch (Exception e) {
+        }
+    }
+
+    public static String getFormattedDateSimple(Long dateTime) {
+        SimpleDateFormat newFormat = new SimpleDateFormat("dd MMM yy hh:mm");
+        return newFormat.format(new Date(dateTime));
+    }
+
 }

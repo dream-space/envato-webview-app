@@ -3,6 +3,7 @@ package com.android.webapp.data;
 import android.app.Application;
 
 import com.android.webapp.advertise.AdNetworkHelper;
+import com.android.webapp.notification.NotificationHelper;
 
 public class ThisApp extends Application {
 
@@ -19,5 +20,8 @@ public class ThisApp extends Application {
 
         // initialize ad network
         AdNetworkHelper.init(this);
+
+        // Init Notification One Signal
+        NotificationHelper.init(this);
     }
 }

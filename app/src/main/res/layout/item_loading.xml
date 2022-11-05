@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/status_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_overlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:minHeight="50dp"
+        android:text="@string/failed_tap_retry"
+        android:textColor="@color/grey_60"
+        android:textSize="12sp" />
+
+    <ProgressBar
+        android:id="@+id/progress_loading"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true" />
+
+</RelativeLayout>

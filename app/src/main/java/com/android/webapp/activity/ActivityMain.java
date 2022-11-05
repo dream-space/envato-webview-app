@@ -2,6 +2,7 @@ package com.android.webapp.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -34,6 +36,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.room.util.StringUtil;
 
 import com.android.webapp.AppConfig;
 import com.android.webapp.R;
@@ -57,9 +60,27 @@ import java.util.Map;
 
 public class ActivityMain extends AppCompatActivity {
 
+    public static final String EXTRA_URL = "intent.EXTRA_URL";
+    public static final String EXTRA_TITLE = "intent.EXTRA_TITLE";
+
+    public static Intent navigate(Context context) {
+        Intent intent = new Intent(context, ActivityMain.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        return intent;
+    }
+
+    public static Intent navigate(Context context, String title, String url) {
+        Intent intent = new Intent(context, ActivityMain.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(EXTRA_TITLE, title);
+        intent.putExtra(EXTRA_URL, url);
+        return intent;
+    }
+
     private ActivityMainBinding binding;
     private PermissionManager mPermissionManager = new PermissionManager(new PermissionRationaleHandler());
     private String lastDownloadUrl = "";
+    private String extraUrl = "", extraTitle = "";
     private boolean webviewSuccess = true;
     private ActionBar actionBar;
     private Map<Integer, DrawerMenuItem> menuMap;
@@ -73,6 +94,10 @@ public class ActivityMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        extraUrl = getIntent().getStringExtra(EXTRA_URL);
+        extraTitle = getIntent().getStringExtra(EXTRA_TITLE);
+
         initComponent();
         initToolbar();
         setupNavigationDrawer();
@@ -80,7 +105,13 @@ public class ActivityMain extends AppCompatActivity {
 
         // load default menu page
         DrawerMenuItem firstMenu = menuMap.get(AppConfig.DEFAULT_MENU_ID);
-        if (firstMenu != null) onNavigationItemSelected(firstMenu);
+        if(TextUtils.isEmpty(extraUrl)){
+            if (firstMenu != null) onNavigationItemSelected(firstMenu);
+        }  else {
+            DrawerMenuItem notifItem = new DrawerMenuItem(100, R.drawable.ic_home, firstMenu.title, extraUrl);
+            if(!TextUtils.isEmpty(extraTitle)) notifItem.title = extraTitle;
+            onNavigationItemSelected(notifItem);
+        }
     }
 
     private void initToolbar() {
@@ -228,12 +259,18 @@ public class ActivityMain extends AppCompatActivity {
 
     private void onNavigationItemSelected(DrawerMenuItem item) {
         binding.drawerLayout.closeDrawer(GravityCompat.START);
+        if (AppConfig.SHOW_INTERSTITIAL_WHEN == InterstitialMode.DRAWER_MENU_CLICK) {
+            showInterstitialAd();
+        }
+
+        if(item.activity != null){
+            startActivity(new Intent(this, item.activity));
+            return;
+        }
+
         loadWebView(item.url);
         if (AppConfig.TOOLBAR_TITLE_MODE == ToolbarTitleMode.DRAWER_TITLE_MENU) {
             actionBar.setTitle(item.title);
-        }
-        if (AppConfig.SHOW_INTERSTITIAL_WHEN == InterstitialMode.DRAWER_MENU_CLICK) {
-            showInterstitialAd();
         }
     }
 
@@ -356,16 +393,10 @@ public class ActivityMain extends AppCompatActivity {
         if (binding.mainWebView.canGoBack()) {
             binding.mainWebView.goBack();
         } else {
-            if (AppConfig.SHOW_DRAWER_NAVIGATION && binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                binding.drawerLayout.closeDrawer(GravityCompat.START);
+            if (AppConfig.EXIT_CONFIRMATION) {
+                doExitApp();
             } else {
-                if (AppConfig.EXIT_CONFIRMATION) {
-                    Snackbar.make(binding.coordinatorLayout, R.string.exit_confirmation_message, Snackbar.LENGTH_LONG)
-                            .setAction(R.string.exit_confirmation_action, view -> super.onBackPressed())
-                            .show();
-                } else {
-                    super.onBackPressed();
-                }
+                super.onBackPressed();
             }
         }
     }
@@ -408,6 +439,20 @@ public class ActivityMain extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         Tools.checkGooglePlayUpdateStopListener();
+    }
+
+    private long exitTime = 0;
+    public void doExitApp() {
+        if (!binding.drawerLayout.isDrawerOpen(GravityCompat.START) && AppConfig.SHOW_DRAWER_NAVIGATION) {
+            binding.drawerLayout.openDrawer(GravityCompat.START);
+        } else {
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                Toast.makeText(this, R.string.press_again_exit_app, Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+            }
+        }
     }
 
     private class CustomWebViewClient extends WebViewClient {

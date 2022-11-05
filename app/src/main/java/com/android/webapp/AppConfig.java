@@ -1,4 +1,5 @@
 package com.android.webapp;
+import com.android.webapp.activity.ActivityNotification;
 import com.android.webapp.model.InterstitialMode;
 import com.android.webapp.model.LoadingMode;
 import com.android.webapp.data.ToolbarTitleMode;
@@ -15,16 +16,17 @@ public class AppConfig {
     public static DrawerMenuItem[] DRAWER_MENU = {
             new DrawerMenuItem(100, R.drawable.ic_home, "Home", "https://demo.dream-space.web.id/webview/"),
             new DrawerMenuItem(200, R.drawable.ic_produts, "Product", "https://codecanyon.net/user/dream_space/portfolio?order_by=sales"),
-            new DrawerMenuItem(300, R.drawable.ic_offline, "Offline", "file:///android_asset/about.html"),
+            new DrawerMenuItem(300, R.drawable.ic_offline, "Offline", "file:///android_asset/offline.html"),
             new DrawerMenuItem(400, R.drawable.ic_video, "Videos", "https://youtube.com")
     };
 
     public static String DRAWER_SUBMENU_TITLE = "Others";
 
     public static DrawerMenuItem[] DRAWER_SUBMENU = {
-            new DrawerMenuItem(500, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/developer?id=Dream+Space"),
-            new DrawerMenuItem(600, R.drawable.ic_privacy, "Privacy", "https://dream-space.web.id/privacy-policy"),
-            new DrawerMenuItem(700, R.drawable.ic_about, "About", "file:///android_asset/about.html")
+            new DrawerMenuItem(500, R.drawable.ic_notifications, "Notification", ActivityNotification.class),
+            new DrawerMenuItem(600, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/developer?id=Dream+Space"),
+            new DrawerMenuItem(700, R.drawable.ic_privacy, "Privacy", "https://dream-space.web.id/privacy-policy"),
+            new DrawerMenuItem(800, R.drawable.ic_about, "About", "file:///android_asset/about.html")
     };
 
     public static boolean SHOW_DRAWER_NAVIGATION = true;
@@ -71,6 +73,10 @@ public class AppConfig {
     public static String[] LINKS_OPEN_INTERNALLY = {
             "target=internal"
     };
+
+    // notification --------------------------------------------------------------------------------
+
+    public static String ONE_SIGNAL_APP_ID = "6543b161-3f62-40c1-9652-e30d39b32628";
 
     // ads networks --------------------------------------------------------------------------------
 
