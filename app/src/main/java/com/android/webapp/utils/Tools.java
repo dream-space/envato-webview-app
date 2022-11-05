@@ -7,6 +7,7 @@ import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -30,10 +31,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.android.webapp.AppConfig;
+import com.android.webapp.BuildConfig;
 import com.android.webapp.R;
 import com.android.webapp.data.ThisApp;
 import com.android.webapp.data.ToolbarTitleMode;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
 
 public class Tools {
 
@@ -45,7 +56,7 @@ public class Tools {
         bar.setDisplayHomeAsUpEnabled(AppConfig.SHOW_DRAWER_NAVIGATION);
         bar.setHomeButtonEnabled(AppConfig.SHOW_DRAWER_NAVIGATION);
 
-        if(!AppConfig.TOOLBAR) bar.hide();
+        if (!AppConfig.TOOLBAR) bar.hide();
         if (AppConfig.SYSTEM_BAR_LIGHT) setSystemBarLight(act);
         toolbar.setBackgroundColor(Color.parseColor(AppConfig.TOOLBAR_COLOR));
         toolbar.setTitleTextColor(Color.parseColor(AppConfig.TOOLBAR_TEXT_ICON_COLOR));
@@ -250,5 +261,45 @@ public class Tools {
         } else {
             return Long.toString(System.currentTimeMillis());
         }
+    }
+
+    private static AppUpdateManager appUpdateManager;
+    private static InstallStateUpdatedListener installStateUpdatedListener;
+
+    public static void checkGooglePlayUpdateStopListener() {
+        if (appUpdateManager != null)
+            appUpdateManager.unregisterListener(installStateUpdatedListener);
+    }
+
+    public static void checkGooglePlayUpdate(Activity activity) {
+        if (BuildConfig.DEBUG) return;
+        installStateUpdatedListener = state -> {
+            if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                Snackbar snackbar = Snackbar.make(activity.findViewById(android.R.id.content), R.string.update_ready, Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAction(R.string.install, view -> {
+                    if (appUpdateManager != null) appUpdateManager.completeUpdate();
+                });
+                snackbar.show();
+            } else if (state.installStatus() == InstallStatus.INSTALLED) {
+                if (appUpdateManager != null && installStateUpdatedListener != null) {
+                    appUpdateManager.unregisterListener(installStateUpdatedListener);
+                }
+            } else {
+
+            }
+        };
+
+        appUpdateManager = AppUpdateManagerFactory.create(activity);
+        Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+        appUpdateManager.registerListener(installStateUpdatedListener);
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+                try {
+                    appUpdateManager.startUpdateFlowForResult(appUpdateInfo, AppUpdateType.FLEXIBLE, activity, 200);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,16 +37,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.android.webapp.AppConfig;
 import com.android.webapp.R;
-import com.android.webapp.data.LoadingMode;
+import com.android.webapp.advertise.AdNetworkHelper;
 import com.android.webapp.data.ToolbarTitleMode;
 import com.android.webapp.databinding.ActivityMainBinding;
 import com.android.webapp.model.DrawerMenuItem;
+import com.android.webapp.model.InterstitialMode;
+import com.android.webapp.model.LoadingMode;
 import com.android.webapp.utils.PermissionManager;
 import com.android.webapp.utils.PermissionRationaleHandler;
 import com.android.webapp.utils.Tools;
 import com.android.webapp.webview.AdvancedWebView;
 import com.android.webapp.webview.VideoEnabledWebChromeClient;
 import com.android.webapp.webview.VideoEnabledWebView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,6 +76,7 @@ public class ActivityMain extends AppCompatActivity {
         initComponent();
         initToolbar();
         setupNavigationDrawer();
+        prepareAds();
 
         // load default menu page
         DrawerMenuItem firstMenu = menuMap.get(AppConfig.DEFAULT_MENU_ID);
@@ -100,6 +105,9 @@ public class ActivityMain extends AppCompatActivity {
         webviewSuccess = true;
         showLoading(true);
         binding.mainWebView.loadUrl(url);
+        if (AppConfig.SHOW_INTERSTITIAL_WHEN == InterstitialMode.URL_LOAD) {
+            showInterstitialAd();
+        }
     }
 
     private void initComponent() {
@@ -117,6 +125,10 @@ public class ActivityMain extends AppCompatActivity {
         binding.mainWebView.getSettings().setGeolocationEnabled(true);
         binding.mainWebView.getSettings().setSupportZoom(true);
         binding.mainWebView.getSettings().setBuiltInZoomControls(false);
+        // user agent
+        if (AppConfig.WEB_USER_AGENT != null && !AppConfig.WEB_USER_AGENT.equals("")) {
+            binding.mainWebView.getSettings().setUserAgentString(AppConfig.WEB_USER_AGENT);
+        }
         validateGeolocation();
 
         // webview chrome client
@@ -219,6 +231,9 @@ public class ActivityMain extends AppCompatActivity {
         loadWebView(item.url);
         if (AppConfig.TOOLBAR_TITLE_MODE == ToolbarTitleMode.DRAWER_TITLE_MENU) {
             actionBar.setTitle(item.title);
+        }
+        if (AppConfig.SHOW_INTERSTITIAL_WHEN == InterstitialMode.DRAWER_MENU_CLICK) {
+            showInterstitialAd();
         }
     }
 
@@ -341,7 +356,17 @@ public class ActivityMain extends AppCompatActivity {
         if (binding.mainWebView.canGoBack()) {
             binding.mainWebView.goBack();
         } else {
-            super.onBackPressed();
+            if (AppConfig.SHOW_DRAWER_NAVIGATION && binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                if (AppConfig.EXIT_CONFIRMATION) {
+                    Snackbar.make(binding.coordinatorLayout, R.string.exit_confirmation_message, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.exit_confirmation_action, view -> super.onBackPressed())
+                            .show();
+                } else {
+                    super.onBackPressed();
+                }
+            }
         }
     }
 
@@ -371,6 +396,18 @@ public class ActivityMain extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        Tools.checkGooglePlayUpdate(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Tools.checkGooglePlayUpdateStopListener();
     }
 
     private class CustomWebViewClient extends WebViewClient {
@@ -440,6 +477,19 @@ public class ActivityMain extends AppCompatActivity {
                 return Tools.startIntentActivity(ActivityMain.this, url);
             }
         }
+    }
+
+    private AdNetworkHelper adNetworkHelper;
+
+    private void prepareAds() {
+        adNetworkHelper = new AdNetworkHelper(this);
+        adNetworkHelper.updateConsentStatus();
+        adNetworkHelper.loadBannerAd(AppConfig.ENABLE_BANNER);
+        adNetworkHelper.loadInterstitialAd(AppConfig.ENABLE_INTERSTITIAL);
+    }
+
+    public void showInterstitialAd() {
+        adNetworkHelper.showInterstitialAd(AppConfig.ENABLE_INTERSTITIAL);
     }
 
     private boolean isLinkExternal(String url) {

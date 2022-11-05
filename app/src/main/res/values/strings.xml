@@ -25,4 +25,10 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
+    <string name="exit_confirmation_message">Are you sure you want to exit?</string>
+    <string name="exit_confirmation_action">Yes</string>
+
+    <string name="update_ready">New app update is ready!</string>
+    <string name="install">Install</string>
+
 </resources>
