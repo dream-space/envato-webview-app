@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="150dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/colorPrimary"
     android:gravity="bottom"
     android:orientation="vertical">
@@ -22,11 +23,14 @@
         <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@mipmap/ic_launcher" />
+            android:layout_margin="2dp"
+            app:tint="@color/white"
+            android:src="@drawable/logo" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:text="@string/app_name"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:fontFamily="sans-serif"
