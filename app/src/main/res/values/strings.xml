@@ -8,8 +8,8 @@
 
     <string name="action_refresh">Refresh</string>
 
-    <string name="app_deep_link_host" translatable="false">dream-space.web.id</string>
-    <string name="app_deep_link_path" translatable="false">/.*</string>
+    <string name="deep_link_host_url" translatable="false">dream-space.web.id</string>
+    <string name="deep_link_path" translatable="false">/.*</string>
 
     <string name="network_offline_msg">No Internet connection\nTap to retry</string>
     <string name="general_error_msg">Oops, something went wrong\nTap to retry</string>

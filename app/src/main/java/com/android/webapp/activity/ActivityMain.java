@@ -36,7 +36,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.room.util.StringUtil;
 
 import com.android.webapp.AppConfig;
 import com.android.webapp.R;
@@ -52,7 +51,6 @@ import com.android.webapp.utils.Tools;
 import com.android.webapp.webview.AdvancedWebView;
 import com.android.webapp.webview.VideoEnabledWebChromeClient;
 import com.android.webapp.webview.VideoEnabledWebView;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -230,7 +228,7 @@ public class ActivityMain extends AppCompatActivity {
     private void setupNavigationDrawer() {
         Menu menu = binding.navigation.getMenu();
         menuMap = new HashMap<>();
-        for (DrawerMenuItem d : AppConfig.DRAWER_MENU) {
+        for (DrawerMenuItem d : AppConfig.DRAWER_TOP_MENU) {
             menu.add(0, d.id, Menu.NONE, d.title).setIcon(d.icon);
             menuMap.put(d.id, d);
         }
