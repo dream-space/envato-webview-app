@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.app.webapp'
+    namespace 'com.webview.space'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.app.webapp"
+        applicationId "com.webview.space"
         minSdk 19
         targetSdk 33
         versionCode 1
