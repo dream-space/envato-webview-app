@@ -60,7 +60,7 @@
             android:value="@string/admob_app_id" />
         <meta-data
             android:name="com.onesignal.NotificationServiceExtension"
-            android:value="com.android.webapp.notification.OneSignalServiceExtension" />
+            android:value="com.app.webapp.notification.OneSignalServiceExtension" />
         <meta-data
             android:name="com.onesignal.NotificationOpened.DEFAULT"
             android:value="DISABLE" />

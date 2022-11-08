@@ -3,15 +3,16 @@ plugins {
 }
 
 android {
-    namespace 'com.android.webapp'
+    namespace 'com.app.webapp'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.android.webapp"
+        applicationId "com.app.webapp"
         minSdk 19
         targetSdk 33
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
 
     buildFeatures {
