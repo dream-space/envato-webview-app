@@ -52,6 +52,7 @@ import com.webview.space.model.InterstitialMode;
 import com.webview.space.model.LoadingMode;
 import com.webview.space.utils.PermissionManager;
 import com.webview.space.utils.PermissionRationaleHandler;
+import com.webview.space.utils.PermissionUtil;
 import com.webview.space.utils.Tools;
 import com.webview.space.webview.AdvancedWebView;
 import com.webview.space.webview.VideoEnabledWebChromeClient;
@@ -115,6 +116,9 @@ public class ActivityMain extends AppCompatActivity {
             if (!TextUtils.isEmpty(extraTitle)) notifItem.title = extraTitle;
             onNavigationItemSelected(notifItem);
         }
+
+        // Permission Notification
+        PermissionUtil.checkAndRequestNotification(this);
     }
 
     private void initToolbar() {
