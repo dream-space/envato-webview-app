@@ -65,12 +65,12 @@ public class NotificationHelper {
 
                 // start activity
                 Intent intent;
-                if (url == null) {
+                if (TextUtils.isEmpty(url)) {
                     intent = ActivityMain.navigate(context);
                 } else {
                     intent = ActivityMain.navigate(context, title, url);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 }
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
 
             } catch (JSONException e) {

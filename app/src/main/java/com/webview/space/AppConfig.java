@@ -29,7 +29,8 @@ public class AppConfig {
             new DrawerMenuItem(100, R.drawable.ic_home, "Home", "https://demo.dream-space.web.id/webview/"),
             new DrawerMenuItem(200, R.drawable.ic_produts, "Product", "https://codecanyon.net/user/dream_space/portfolio?order_by=sales"),
             new DrawerMenuItem(300, R.drawable.ic_offline, "Offline", "file:///android_asset/offline.html"),
-            new DrawerMenuItem(400, R.drawable.ic_video, "Videos", "https://youtube.com")
+            new DrawerMenuItem(400, R.drawable.ic_video, "Videos", "https://youtube.com"),
+            new DrawerMenuItem(500, R.drawable.ic_open_in_new, "Input Url", "#INPUT")
     };
 
     /* menu top and bottom separator */
@@ -37,10 +38,10 @@ public class AppConfig {
 
     /* List of bottom drawer menu, This list menu will show at the bottom drawer menu */
     public static DrawerMenuItem[] DRAWER_SUBMENU = {
-            new DrawerMenuItem(500, R.drawable.ic_notifications, "Notification", ActivityNotification.class),
-            new DrawerMenuItem(600, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/developer?id=Dream+Space"),
-            new DrawerMenuItem(700, R.drawable.ic_privacy, "Privacy", "https://dream-space.web.id/privacy-policy"),
-            new DrawerMenuItem(800, R.drawable.ic_about, "About", "file:///android_asset/about.html")
+            new DrawerMenuItem(600, R.drawable.ic_notifications, "Notification", ActivityNotification.class),
+            new DrawerMenuItem(700, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/developer?id=Dream+Space"),
+            new DrawerMenuItem(800, R.drawable.ic_privacy, "Privacy", "https://dream-space.web.id/privacy-policy"),
+            new DrawerMenuItem(900, R.drawable.ic_about, "About", "file:///android_asset/about.html")
     };
 
     /* true for enabling drawer menu */
@@ -86,7 +87,7 @@ public class AppConfig {
     // web and links -------------------------------------------------------------------------------
     /* set user agent for the web view,
     * leave this value empty if you do not want to set user agent */
-    public static String WEB_USER_AGENT = "";
+    public static String WEB_USER_AGENT = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
 
     /* true for enabling web geolocation */
     public static boolean WEB_GEOLOCATION = true;
@@ -146,7 +147,7 @@ public class AppConfig {
 
     /* Ad networks selection,
      * Available ad networks ADMOB, FAN, UNITY, IRONSOURCE, APPLOVIN */
-    public static AdNetworkType AD_NETWORK = AdNetworkType.ADMOB;
+    public static AdNetworkType AD_NETWORK = AdNetworkType.IRONSOURCE;
 
     /* show interstitial after several action, this value for action counter */
     public static int AD_INTERSTITIAL_INTERVAL = 10;
@@ -162,7 +163,7 @@ public class AppConfig {
     public static String AD_FAN_BANNER_UNIT_ID = "IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID";
     public static String AD_FAN_INTERSTITIAL_UNIT_ID = "IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID";
 
-    public static String AD_IRONSOURCE_APP_KEY = "172a53645";
+    public static String AD_IRONSOURCE_APP_KEY = "19ce3107d";
     public static String AD_IRONSOURCE_BANNER_UNIT_ID = "DefaultBanner";
     public static String AD_IRONSOURCE_INTERSTITIAL_UNIT_ID = "DefaultInterstitial";
 

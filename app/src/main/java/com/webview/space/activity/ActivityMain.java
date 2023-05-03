@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -24,7 +25,10 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -103,11 +108,11 @@ public class ActivityMain extends AppCompatActivity {
 
         // load default menu page
         DrawerMenuItem firstMenu = menuMap.get(AppConfig.DEFAULT_MENU_ID);
-        if(TextUtils.isEmpty(extraUrl)){
+        if (TextUtils.isEmpty(extraUrl)) {
             if (firstMenu != null) onNavigationItemSelected(firstMenu);
-        }  else {
+        } else {
             DrawerMenuItem notifItem = new DrawerMenuItem(100, R.drawable.ic_home, firstMenu.title, extraUrl);
-            if(!TextUtils.isEmpty(extraTitle)) notifItem.title = extraTitle;
+            if (!TextUtils.isEmpty(extraTitle)) notifItem.title = extraTitle;
             onNavigationItemSelected(notifItem);
         }
     }
@@ -134,9 +139,6 @@ public class ActivityMain extends AppCompatActivity {
         webviewSuccess = true;
         showLoading(true);
         binding.mainWebView.loadUrl(url);
-        if (AppConfig.SHOW_INTERSTITIAL_WHEN == InterstitialMode.URL_LOAD) {
-            showInterstitialAd();
-        }
     }
 
     private void initComponent() {
@@ -261,14 +263,23 @@ public class ActivityMain extends AppCompatActivity {
             showInterstitialAd();
         }
 
-        if(item.activity != null){
+        if (item.activity != null) {
             startActivity(new Intent(this, item.activity));
             return;
         }
 
-        loadWebView(item.url);
+        if (item.url.equalsIgnoreCase("#INPUT")) {
+            showDialogInputUrl();
+            return;
+        }
+
+        loadWebViewAndChangeTitle(item.url, item.title);
+    }
+
+    private void loadWebViewAndChangeTitle(String url, String title) {
+        loadWebView(url);
         if (AppConfig.TOOLBAR_TITLE_MODE == ToolbarTitleMode.DRAWER_TITLE_MENU) {
-            actionBar.setTitle(item.title);
+            actionBar.setTitle(title);
         }
     }
 
@@ -440,6 +451,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private long exitTime = 0;
+
     public void doExitApp() {
         if (!binding.drawerLayout.isDrawerOpen(GravityCompat.START) && AppConfig.SHOW_DRAWER_NAVIGATION) {
             binding.drawerLayout.openDrawer(GravityCompat.START);
@@ -464,6 +476,9 @@ public class ActivityMain extends AppCompatActivity {
                 showEmptyState(false, R.drawable.ic_error, "");
                 if (AppConfig.TOOLBAR_TITLE_MODE == ToolbarTitleMode.FROM_WEB) {
                     actionBar.setTitle(view.getTitle());
+                }
+                if (AppConfig.SHOW_INTERSTITIAL_WHEN == InterstitialMode.URL_LOAD) {
+                    showInterstitialAd();
                 }
             } else {
                 binding.mainWebView.setVisibility(View.INVISIBLE);
@@ -547,5 +562,39 @@ public class ActivityMain extends AppCompatActivity {
             if (url.contains(rule)) return true;
         }
         return false;
+    }
+
+    private void showDialogInputUrl() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Input Url");
+
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        ll.setPadding(Tools.dpToPx(this, 22), Tools.dpToPx(this, 10), Tools.dpToPx(this, 22), ll.getPaddingBottom());
+        final EditText input = new EditText(this);
+        input.setHint("ex : www.google.com");
+        input.setTextAppearance(this, androidx.appcompat.R.style.Base_TextAppearance_AppCompat_Body1);
+        ll.addView(input);
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(ll)
+                .setTitle("Input Url")
+                .setPositiveButton("OPEN", null)
+                .create();
+
+        dialog.setOnShowListener(dialogInterface -> {
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> {
+                String url = input.getText().toString();
+                if (!Patterns.WEB_URL.matcher(url).matches()) {
+                    input.setError("Invalid url");
+                    return;
+                }
+                loadWebViewAndChangeTitle(url, url);
+                dialog.dismiss();
+            });
+        });
+        dialog.show();
     }
 }
