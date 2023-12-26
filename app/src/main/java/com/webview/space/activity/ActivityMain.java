@@ -140,9 +140,20 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void loadWebView(String url) {
-        webviewSuccess = true;
-        showLoading(true);
-        binding.mainWebView.loadUrl(url);
+        boolean external = isLinkExternal(url);
+        boolean internal = isLinkInternal(url);
+        if (!external && !internal) {
+            external = AppConfig.OPEN_ALL_LINKS_EXTERNALLY;
+        }
+
+        // open the link
+        if (external) {
+            Tools.startWebActivity(ActivityMain.this, url);
+        } else {
+            webviewSuccess = true;
+            showLoading(true);
+            binding.mainWebView.loadUrl(url);
+        }
     }
 
     private void initComponent() {
@@ -305,7 +316,7 @@ public class ActivityMain extends AppCompatActivity {
 
         @Override
         public void onDownloadRequested(String url, String suggestedFilename, String mimeType, long contentLength, String contentDisposition, String userAgent) {
-            mPermissionManager.request(ActivityMain.this, Manifest.permission.WRITE_EXTERNAL_STORAGE, new PermissionManager.PermissionAction<ActivityMain>() {
+            mPermissionManager.request(ActivityMain.this, PermissionManager.STORAGE, new PermissionManager.PermissionAction<ActivityMain>() {
                         @Override
                         public void run(@NonNull ActivityMain requestable) {
                             requestable.handleDownloadPermissionGranted(url, suggestedFilename, mimeType, userAgent);

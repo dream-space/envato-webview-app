@@ -1,8 +1,10 @@
 package com.webview.space.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -20,6 +22,7 @@ public class PermissionManager {
 
     private static final int REQUEST_CODE_PERMISSION = 1;
     private static final int REQUEST_CODE_PERMISSIONS = 2;
+    public static final String STORAGE = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ? Manifest.permission.WRITE_EXTERNAL_STORAGE : Manifest.permission.ACCESS_MEDIA_LOCATION;
 
     private RationaleHandler mRationaleHandler;
     private PermissionCallback mPermissionCallback;

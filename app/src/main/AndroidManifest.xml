@@ -2,10 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -16,7 +21,6 @@
     <application
         android:name=".data.ThisApp"
         android:allowBackup="true"
-        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -28,7 +32,8 @@
             android:name=".activity.ActivityMain"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:launchMode="standard">
+            android:launchMode="standard"
+            android:screenOrientation="sensor">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -43,7 +48,9 @@
         </activity>
         <activity
             android:name=".activity.ActivitySplash"
-            android:exported="true">
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="sensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,7 +60,9 @@
 
         <activity
             android:name=".activity.ActivityNotification"
-            android:exported="false"/>
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:screenOrientation="sensor" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

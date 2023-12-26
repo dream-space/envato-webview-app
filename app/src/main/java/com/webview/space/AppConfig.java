@@ -147,7 +147,7 @@ public class AppConfig {
 
     /* Ad networks selection,
      * Available ad networks ADMOB, FAN, UNITY, IRONSOURCE, APPLOVIN */
-    public static AdNetworkType AD_NETWORK = AdNetworkType.IRONSOURCE;
+    public static AdNetworkType AD_NETWORK = AdNetworkType.ADMOB;
 
     /* show interstitial after several action, this value for action counter */
     public static int AD_INTERSTITIAL_INTERVAL = 10;
@@ -156,9 +156,9 @@ public class AppConfig {
 
     /* ----- Value below is unit id for ad networks, the name is pretty clear for unit ID  ------*/
 
-    public static String AD_ADMOB_PUBLISHER_ID = "pub-3239677920600357";
-    public static String AD_ADMOB_BANNER_UNIT_ID = "ca-app-pub-3940256099942544/6300978111";
-    public static String AD_ADMOB_INTERSTITIAL_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
+    public static String AD_ADMOB_PUBLISHER_ID = "pub-4553889194429284";
+    public static String AD_ADMOB_BANNER_UNIT_ID = "ca-app-pub-4553889194429284/3663975235";
+    public static String AD_ADMOB_INTERSTITIAL_UNIT_ID = "ca-app-pub-4553889194429284/2103481558";
 
     public static String AD_FAN_BANNER_UNIT_ID = "IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID";
     public static String AD_FAN_INTERSTITIAL_UNIT_ID = "IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID";
