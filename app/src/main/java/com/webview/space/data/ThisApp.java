@@ -18,9 +18,6 @@ public class ThisApp extends Application {
         super.onCreate();
         mInstance = this;
 
-        // initialize ad network
-        AdNetworkHelper.init(this);
-
         // Init Notification One Signal
         NotificationHelper.init(this);
     }

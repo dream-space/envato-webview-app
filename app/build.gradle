@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace 'com.webview.space'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.webview.space"
-        minSdk 19
-        targetSdk 33
-        versionCode 112
-        versionName "1.1"
+        minSdk 21
+        targetSdk 34
+        versionCode 120
+        versionName "1.2"
         multiDexEnabled true
     }
 
@@ -37,22 +37,29 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.3.0'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.play:app-update:2.0.1'
-
-    // ad network
-    implementation 'com.github.dream-space:dreamspace-ads-sdk:1.1.1'
+    implementation 'com.google.android.play:app-update:2.1.0'
 
     // one signal
     implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'
 
     // room database
-    implementation 'androidx.room:room-runtime:2.4.3'
-    annotationProcessor 'androidx.room:room-compiler:2.4.3'
+    implementation 'androidx.room:room-runtime:2.6.1'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
 
     // glide image loader
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    // AD NETWORKS OPTIONS :
+    // 3.0.1-all = Uses Admob, Meta Audience Network, IronSource, Google Ad Manager, Unity Ads, Startapp, Applovin, Applovin Max, Wortise
+    // 3.0.1-triple = Uses AdMob, Google Ad Manager, Meta Audience Network and Applovin
+    // 3.0.1-simple = Uses AdMob, Google Ad Manager, Meta Audience Network
+    // 3.0.1-ex-wortise = Uses all of ads exclude Wortise
+    // 3.0.1-custom = Uses AdMob, Meta Audience Network, IronSource
+    // 3.0.1-admob-only = Uses Admob Only
+    // 3.0.1-none = Doesn't use any ads
+    implementation 'com.github.dream-space:dreamspace-ads-sdk:3.0.1-custom'
 }

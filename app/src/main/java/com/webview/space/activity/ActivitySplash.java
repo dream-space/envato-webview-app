@@ -6,23 +6,26 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.webview.space.AppConfig;
+import com.webview.space.advertise.AdNetworkHelper;
 import com.webview.space.databinding.ActivitySplashBinding;
 
 public class ActivitySplash extends AppCompatActivity {
 
     private ActivitySplashBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySplashBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        if(!AppConfig.SPLASH_SCREEN){
+        if (!AppConfig.SPLASH_SCREEN) {
             startActivityMain();
             return;
         }
@@ -49,8 +52,16 @@ public class ActivitySplash extends AppCompatActivity {
     }
 
     private void startActivityMain() {
-        Intent i = new Intent(ActivitySplash.this, ActivityMain.class);
-        startActivity(i);
-        finish();
+        // init ads
+        AdNetworkHelper adNetworkHelper = new AdNetworkHelper(this);
+        adNetworkHelper.init();
+        // init open ads for admob
+        adNetworkHelper.loadAndShowOpenAppAd(this, AppConfig.ENABLE_SPLASH_OPEN_APP, () -> {
+            new Handler(getMainLooper()).postDelayed(() -> {
+                Intent i = new Intent(ActivitySplash.this, ActivityMain.class);
+                startActivity(i);
+                finish();
+            }, 1000);
+        });
     }
 }

@@ -4,13 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.webview.space.AppConfig;
+import com.webview.space.BuildConfig;
 import com.webview.space.R;
 
 import dreamspace.ads.sdk.AdConfig;
 import dreamspace.ads.sdk.AdNetwork;
 import dreamspace.ads.sdk.gdpr.GDPR;
 import dreamspace.ads.sdk.gdpr.LegacyGDPR;
+import dreamspace.ads.sdk.gdpr.UMP;
 import dreamspace.ads.sdk.listener.AdBannerListener;
+import dreamspace.ads.sdk.listener.AdOpenListener;
+import dreamspace.ads.sdk.listener.AdRewardedListener;
 
 public class AdNetworkHelper {
 
@@ -28,40 +32,67 @@ public class AdNetworkHelper {
 
     public void updateConsentStatus() {
         if (!AppConfig.AD_ENABLE || !AppConfig.ENABLE_GDPR) return;
-        if (AppConfig.LEGACY_GDPR) {
-            legacyGDPR.updateLegacyGDPRConsentStatus(AppConfig.AD_ADMOB_PUBLISHER_ID, AppConfig.PRIVACY_POLICY_URL);
-        } else {
-            gdpr.updateGDPRConsentStatus();
-        }
+        gdpr.updateGDPRConsentStatus();
     }
 
-    public static void init(Context context) {
+    public static void initConfig() {
         AdConfig.ad_enable = AppConfig.AD_ENABLE;
-        AdConfig.debug_mode = true;
-        AdConfig.enable_gdpr = true;
-        AdConfig.ad_network = AppConfig.AD_NETWORK;
-        AdConfig.ad_inters_interval = AppConfig.AD_INTERSTITIAL_INTERVAL;
+        AdConfig.ad_networks = AppConfig.AD_NETWORKS;
+        AdConfig.retry_from_start_max = AppConfig.RETRY_FROM_START_MAX;
+        AdConfig.enable_gdpr = AppConfig.ENABLE_GDPR;
+
+        AdConfig.ad_replace_unsupported_open_app_with_interstitial_on_splash = AppConfig.AD_REPLACE_UNSUPPORTED_OPEN_APP_WITH_INTERSTITIAL_ON_SPLASH;
+        AdConfig.ad_inters_interval = AppConfig.AD_INTERS_INTERVAL;
+        AdConfig.ad_enable_open_app = AppConfig.ENABLE_GLOBAL_OPEN_APP;
+        AdConfig.limit_time_open_app_loading = AppConfig.LIMIT_TIME_OPEN_APP_LOADING;
+        AdConfig.debug_mode = BuildConfig.DEBUG;
 
         AdConfig.ad_admob_publisher_id = AppConfig.AD_ADMOB_PUBLISHER_ID;
         AdConfig.ad_admob_banner_unit_id = AppConfig.AD_ADMOB_BANNER_UNIT_ID;
         AdConfig.ad_admob_interstitial_unit_id = AppConfig.AD_ADMOB_INTERSTITIAL_UNIT_ID;
+        AdConfig.ad_admob_rewarded_unit_id = AppConfig.AD_ADMOB_REWARDED_UNIT_ID;
+        AdConfig.ad_admob_open_app_unit_id = AppConfig.AD_ADMOB_OPEN_APP_UNIT_ID;
+
+        AdConfig.ad_manager_banner_unit_id = AppConfig.AD_MANAGER_BANNER_UNIT_ID;
+        AdConfig.ad_manager_interstitial_unit_id = AppConfig.AD_MANAGER_INTERSTITIAL_UNIT_ID;
+        AdConfig.ad_manager_rewarded_unit_id = AppConfig.AD_MANAGER_REWARDED_UNIT_ID;
+        AdConfig.ad_manager_open_app_unit_id = AppConfig.AD_MANAGER_OPEN_APP_UNIT_ID;
 
         AdConfig.ad_fan_banner_unit_id = AppConfig.AD_FAN_BANNER_UNIT_ID;
         AdConfig.ad_fan_interstitial_unit_id = AppConfig.AD_FAN_INTERSTITIAL_UNIT_ID;
+        AdConfig.ad_fan_rewarded_unit_id = AppConfig.AD_FAN_REWARDED_UNIT_ID;
 
         AdConfig.ad_ironsource_app_key = AppConfig.AD_IRONSOURCE_APP_KEY;
         AdConfig.ad_ironsource_banner_unit_id = AppConfig.AD_IRONSOURCE_BANNER_UNIT_ID;
+        AdConfig.ad_ironsource_rewarded_unit_id = AppConfig.AD_IRONSOURCE_REWARDED_UNIT_ID;
         AdConfig.ad_ironsource_interstitial_unit_id = AppConfig.AD_IRONSOURCE_INTERSTITIAL_UNIT_ID;
 
         AdConfig.ad_unity_game_id = AppConfig.AD_UNITY_GAME_ID;
         AdConfig.ad_unity_banner_unit_id = AppConfig.AD_UNITY_BANNER_UNIT_ID;
+        AdConfig.ad_unity_rewarded_unit_id = AppConfig.AD_UNITY_REWARDED_UNIT_ID;
         AdConfig.ad_unity_interstitial_unit_id = AppConfig.AD_UNITY_INTERSTITIAL_UNIT_ID;
 
-        AdNetwork.init(context);
+        AdConfig.ad_applovin_banner_unit_id = AppConfig.AD_APPLOVIN_BANNER_UNIT_ID;
+        AdConfig.ad_applovin_interstitial_unit_id = AppConfig.AD_APPLOVIN_INTERSTITIAL_UNIT_ID;
+        AdConfig.ad_applovin_rewarded_unit_id = AppConfig.AD_APPLOVIN_REWARDED_UNIT_ID;
+        AdConfig.ad_applovin_open_app_unit_id = AppConfig.AD_APPLOVIN_OPEN_APP_UNIT_ID;
+
+        AdConfig.ad_applovin_banner_zone_id = AppConfig.AD_APPLOVIN_BANNER_ZONE_ID;
+        AdConfig.ad_applovin_interstitial_zone_id = AppConfig.AD_APPLOVIN_INTERSTITIAL_ZONE_ID;
+        AdConfig.ad_applovin_rewarded_zone_id = AppConfig.AD_APPLOVIN_REWARDED_ZONE_ID;
+
+        AdConfig.ad_startapp_app_id = AppConfig.AD_STARTAPP_APP_ID;
+
+        AdConfig.ad_wortise_app_id = AppConfig.AD_WORTISE_APP_ID;
+        AdConfig.ad_wortise_banner_unit_id = AppConfig.AD_WORTISE_BANNER_UNIT_ID;
+        AdConfig.ad_wortise_interstitial_unit_id = AppConfig.AD_WORTISE_INTERSTITIAL_UNIT_ID;
+        AdConfig.ad_wortise_rewarded_unit_id = AppConfig.AD_WORTISE_REWARDED_UNIT_ID;
+        AdConfig.ad_wortise_open_app_unit_id = AppConfig.AD_WORTISE_OPEN_APP_UNIT_ID;
     }
 
-    public void loadBannerAd(boolean enable, AdBannerListener listener) {
-        adNetwork.loadBannerAd(enable, activity.findViewById(R.id.ad_container), listener);
+    public void init() {
+        AdNetworkHelper.initConfig();
+        adNetwork.init();
     }
 
     public void loadBannerAd(boolean enable) {
@@ -74,6 +105,26 @@ public class AdNetworkHelper {
 
     public boolean showInterstitialAd(boolean enable) {
         return adNetwork.showInterstitialAd(enable);
+    }
+
+    public void loadRewardedAd(boolean enable, AdRewardedListener listener) {
+        adNetwork.loadRewardedAd(enable, listener);
+    }
+
+    public boolean showRewardedAd(boolean enable, AdRewardedListener listener) {
+        return adNetwork.showRewardedAd(enable, listener);
+    }
+
+    public void loadAndShowOpenAppAd(Activity activity, boolean enable, AdOpenListener listener) {
+        adNetwork.loadAndShowOpenAppAd(activity, enable, listener);
+    }
+
+    public void destroyAndDetachBanner() {
+        adNetwork.destroyAndDetachBanner();
+    }
+
+    public void loadShowUMPConsentForm() {
+        new UMP(activity).loadShowConsentForm();
     }
 
 }

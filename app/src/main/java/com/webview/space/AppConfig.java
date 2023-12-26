@@ -137,38 +137,99 @@ public class AppConfig {
     /* true for enable ad type interstitial */
     public static boolean ENABLE_INTERSTITIAL = true;
 
+    /* true for enable ad type open app */
+    public static boolean ENABLE_SPLASH_OPEN_APP = true;
+    public static boolean ENABLE_GLOBAL_OPEN_APP = true;
+
     /* Mode when interstitial try to show
     * DRAWER_MENU_CLICK : for try show interstitial when one of drawer menu clicked
     * URL_LOAD          : for try show interstitial when url load*/
     public static InterstitialMode SHOW_INTERSTITIAL_WHEN = InterstitialMode.URL_LOAD;
 
     public static boolean ENABLE_GDPR = true;
+    public static boolean SHOW_UMP = true;
     public static boolean LEGACY_GDPR = false;
 
-    /* Ad networks selection,
-     * Available ad networks ADMOB, FAN, UNITY, IRONSOURCE, APPLOVIN */
-    public static AdNetworkType AD_NETWORK = AdNetworkType.ADMOB;
+    /* ad backup flow retry attempt cycle */
+    public static Integer RETRY_FROM_START_MAX = 2;
+
+    /* when ad networks not supported open app format, it will replace with interstitial format
+     * for placement after plash screen only */
+    public static boolean AD_REPLACE_UNSUPPORTED_OPEN_APP_WITH_INTERSTITIAL_ON_SPLASH = true;
+
+    /* maximum load time in second for open app ads */
+    public static Integer LIMIT_TIME_OPEN_APP_LOADING = 10;
 
     /* show interstitial after several action, this value for action counter */
-    public static int AD_INTERSTITIAL_INTERVAL = 10;
+    public static Integer AD_INTERS_INTERVAL = 5;
 
-    public static String PRIVACY_POLICY_URL = "http://dream-space.web.id/privacy-policy";
+    /* MULTI Ad network selection,
+     * Fill this array to enable ad backup flow, left this empty to use single ad_network above
+     * app will try show sequentially from this array
+     * example flow ADMOB > FAN > IRONSOURCE
+     *
+     * OPTION :
+     * ADMOB,MANAGER, FAN, UNITY, IRONSOURCE, APPLOVIN, APPLOVIN_MAX, APPLOVIN_DISCOVERY,
+     * STARTAPP, WORTISE, FAN_BIDDING_ADMOB, FAN_BIDDING_AD_MANAGER, FAN_BIDDING_APPLOVIN_MAX,
+     * FAN_BIDDING_IRONSOURCE
+     * */
+    public static AdNetworkType[] AD_NETWORKS = {
+            AdNetworkType.ADMOB,
+            AdNetworkType.FAN,
+            AdNetworkType.IRONSOURCE,
+    };
 
     /* ----- Value below is unit id for ad networks, the name is pretty clear for unit ID  ------*/
 
+    /* Ad unit for ADMOB */
     public static String AD_ADMOB_PUBLISHER_ID = "pub-4553889194429284";
-    public static String AD_ADMOB_BANNER_UNIT_ID = "ca-app-pub-4553889194429284/3663975235";
-    public static String AD_ADMOB_INTERSTITIAL_UNIT_ID = "ca-app-pub-4553889194429284/2103481558";
+    public static String AD_ADMOB_BANNER_UNIT_ID = "ca-app-pub-4553889194429284/6870051716";
+    public static String AD_ADMOB_INTERSTITIAL_UNIT_ID = "ca-app-pub-4553889194429284/6860907882";
+    public static String AD_ADMOB_REWARDED_UNIT_ID = "ca-app-pub-4553889194429284/4361052848";
+    public static String AD_ADMOB_OPEN_APP_UNIT_ID = "ca-app-pub-4553889194429284/2659343964";
 
-    public static String AD_FAN_BANNER_UNIT_ID = "IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID";
-    public static String AD_FAN_INTERSTITIAL_UNIT_ID = "IMG_16_9_APP_INSTALL#YOUR_PLACEMENT_ID";
+    /* Ad unit for Google Ad Manager */
+    public static String AD_MANAGER_BANNER_UNIT_ID = "/6499/example/banner";
+    public static String AD_MANAGER_INTERSTITIAL_UNIT_ID = "/6499/example/interstitial";
+    public static String AD_MANAGER_REWARDED_UNIT_ID = "/6499/example/rewarded";
+    public static String AD_MANAGER_OPEN_APP_UNIT_ID = "/6499/example/app-open";
 
-    public static String AD_IRONSOURCE_APP_KEY = "19ce3107d";
+    /* Ad unit for FAN */
+    public static String AD_FAN_BANNER_UNIT_ID = "YOUR_PLACEMENT_ID";
+    public static String AD_FAN_INTERSTITIAL_UNIT_ID = "YOUR_PLACEMENT_ID";
+    public static String AD_FAN_REWARDED_UNIT_ID = "YOUR_PLACEMENT_ID";
+
+    /* Ad unit for IRON SOURCE */
+    public static String AD_IRONSOURCE_APP_KEY = "170112cfd";
     public static String AD_IRONSOURCE_BANNER_UNIT_ID = "DefaultBanner";
+    public static String AD_IRONSOURCE_REWARDED_UNIT_ID = "DefaultRewardedVideo";
     public static String AD_IRONSOURCE_INTERSTITIAL_UNIT_ID = "DefaultInterstitial";
 
-    public static String AD_UNITY_GAME_ID = "4648853";
+    /* Ad unit for UNITY */
+    public static String AD_UNITY_GAME_ID = "4988568";
     public static String AD_UNITY_BANNER_UNIT_ID = "Banner_Android";
+    public static String AD_UNITY_REWARDED_UNIT_ID = "Rewarded_Android";
     public static String AD_UNITY_INTERSTITIAL_UNIT_ID = "Interstitial_Android";
+
+    /* Ad unit for APPLOVIN MAX */
+    public static String AD_APPLOVIN_BANNER_UNIT_ID = "a3a3a5b44c763304";
+    public static String AD_APPLOVIN_INTERSTITIAL_UNIT_ID = "35f9c01af124fcb9";
+    public static String AD_APPLOVIN_REWARDED_UNIT_ID = "21dba76a66f7c9fe";
+    public static String AD_APPLOVIN_OPEN_APP_UNIT_ID = "7c3fcecd43d3f90c";
+
+    /* Ad unit for APPLOVIN DISCOVERY */
+    public static String AD_APPLOVIN_BANNER_ZONE_ID = "df40a31072feccab";
+    public static String AD_APPLOVIN_INTERSTITIAL_ZONE_ID = "d0eea040d4bd561e";
+    public static String AD_APPLOVIN_REWARDED_ZONE_ID = "5d799aeefef733a1";
+
+    /* Ad unit for STARTAPP */
+    public static String AD_STARTAPP_APP_ID = "0";
+
+    /* Ad unit for WORTISE */
+    public static String AD_WORTISE_APP_ID = "test-app-id";
+    public static String AD_WORTISE_BANNER_UNIT_ID = "test-banner";
+    public static String AD_WORTISE_INTERSTITIAL_UNIT_ID = "test-interstitial";
+    public static String AD_WORTISE_REWARDED_UNIT_ID = "test-rewarded";
+    public static String AD_WORTISE_OPEN_APP_UNIT_ID = "test-app-open";
 
 }

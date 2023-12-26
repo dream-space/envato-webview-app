@@ -557,6 +557,7 @@ public class ActivityMain extends AppCompatActivity {
     private void prepareAds() {
         adNetworkHelper = new AdNetworkHelper(this);
         adNetworkHelper.updateConsentStatus();
+        if (AppConfig.SHOW_UMP) adNetworkHelper.loadShowUMPConsentForm();
         adNetworkHelper.loadBannerAd(AppConfig.ENABLE_BANNER);
         adNetworkHelper.loadInterstitialAd(AppConfig.ENABLE_INTERSTITIAL);
     }
