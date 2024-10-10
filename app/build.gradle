@@ -11,8 +11,8 @@ android {
         applicationId "com.webview.space"
         minSdk 21
         targetSdk 34
-        versionCode 120
-        versionName "1.2"
+        versionCode 130
+        versionName "1.3"
         multiDexEnabled true
     }
 
