@@ -1,41 +1,50 @@
 package com.webview.space.notification;
 
+import android.app.Notification;
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+
+import com.onesignal.notifications.IActionButton;
+import com.onesignal.notifications.IDisplayableMutableNotification;
+import com.onesignal.notifications.INotificationReceivedEvent;
+import com.onesignal.notifications.INotificationServiceExtension;
 import com.webview.space.R;
 import com.webview.space.room.AppDatabase;
 import com.webview.space.room.DAO;
 import com.webview.space.room.table.NotificationEntity;
-import com.onesignal.OSMutableNotification;
-import com.onesignal.OSNotification;
-import com.onesignal.OSNotificationReceivedEvent;
-import com.onesignal.OneSignal;
 
 @SuppressWarnings("unused")
-public class OneSignalServiceExtension implements OneSignal.OSRemoteNotificationReceivedHandler {
+public class OneSignalServiceExtension implements INotificationServiceExtension {
 
     @Override
-    public void remoteNotificationReceived(Context context, OSNotificationReceivedEvent notificationReceivedEvent) {
-        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.VERBOSE, "OSRemoteNotificationReceivedHandler fired!" +
-                " with OSNotificationReceived: " + notificationReceivedEvent.toString());
-
-        OSNotification notification = notificationReceivedEvent.getNotification();
-        saveToDatabase(context, notification);
+    public void onNotificationReceived(INotificationReceivedEvent event) {
+        Context context = event.getContext();
+        IDisplayableMutableNotification notification = event.getNotification();
 
         if (notification.getActionButtons() != null) {
-            for (OSNotification.ActionButton button : notification.getActionButtons()) {
-                OneSignal.onesignalLog(OneSignal.LOG_LEVEL.VERBOSE, "ActionButton: " + button.toString());
+            for (IActionButton button : notification.getActionButtons()) {
+                // you can modify your action buttons here
             }
         }
 
-        OSMutableNotification mutableNotification = notification.mutableCopy();
-        mutableNotification.setExtender(builder -> builder.setColor(context.getResources().getColor(R.color.colorPrimary)));
-
-        // If complete isn't call within a time period of 25 seconds, OneSignal internal logic will show the original notification
-        notificationReceivedEvent.complete(mutableNotification);
+        // this is an example of how to modify the notification by changing the background color to blue
+        NotificationCompat.Extender extender = new NotificationCompat.Extender() {
+            @NonNull
+            @Override
+            public NotificationCompat.Builder extend(@NonNull NotificationCompat.Builder builder) {
+                builder.setColor(context.getResources().getColor(R.color.colorPrimary));
+                builder.setSmallIcon(R.drawable.ic_stat_onesignal_default);
+                builder.setDefaults(Notification.DEFAULT_LIGHTS);
+                builder.setAutoCancel(true);
+                return builder;
+            }
+        };
+        notification.setExtender(extender);
     }
 
-    private static void saveToDatabase(Context context, OSNotification notification) {
+    private static void saveToDatabase(Context context, IDisplayableMutableNotification notification) {
         DAO dao = AppDatabase.getDb(context).get();
         NotificationEntity notificationEntity = dao.getNotification(notification.getSentTime());
         if (notificationEntity == null) notificationEntity = new NotificationEntity();

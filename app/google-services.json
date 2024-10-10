@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "143884867799",
+    "project_id": "webview-app-ds",
+    "storage_bucket": "webview-app-ds.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:143884867799:android:f06b5cfcddb4ad67ee7892",
+        "android_client_info": {
+          "package_name": "com.webview.space"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "143884867799-kuccijl462te66s01rf70ooav59hl0hn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQMKHij8Mdm7qAF3plXpczN6XUeTixwWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "143884867799-kuccijl462te66s01rf70ooav59hl0hn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

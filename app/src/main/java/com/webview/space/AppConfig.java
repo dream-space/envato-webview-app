@@ -4,15 +4,21 @@ import com.webview.space.model.InterstitialMode;
 import com.webview.space.model.LoadingMode;
 import com.webview.space.data.ToolbarTitleMode;
 import com.webview.space.model.DrawerMenuItem;
+import com.webview.space.utils.AppConfigExt;
 
 import dreamspace.ads.sdk.data.AdNetworkType;
 
-public class AppConfig {
+public class AppConfig extends AppConfigExt {
 
     // splash screen -----------------------------------------------------------------------------
 
     /* set true when you want show splash screen at start app */
     public static boolean SPLASH_SCREEN = true;
+
+    // remote config -----------------------------------------------------------------------------
+
+    /* set true when you want enable remote config for ads */
+    public static boolean USE_REMOTE_CONFIG = true;
 
 
     // menu and navigation -------------------------------------------------------------------------
@@ -120,6 +126,7 @@ public class AppConfig {
             "target=internal"
     };
 
+    // VARIABLE BELOW CAN CHANGE FROM REMOTE CONFIG ------------------------------------------------
     // notification --------------------------------------------------------------------------------
 
     /* set with your one signal APP ID for enable notification
@@ -169,9 +176,7 @@ public class AppConfig {
      * example flow ADMOB > FAN > IRONSOURCE
      *
      * OPTION :
-     * ADMOB,MANAGER, FAN, UNITY, IRONSOURCE, APPLOVIN, APPLOVIN_MAX, APPLOVIN_DISCOVERY,
-     * STARTAPP, WORTISE, FAN_BIDDING_ADMOB, FAN_BIDDING_AD_MANAGER, FAN_BIDDING_APPLOVIN_MAX,
-     * FAN_BIDDING_IRONSOURCE
+     * ADMOB, MANAGER, FAN, IRONSOURCE
      * */
     public static AdNetworkType[] AD_NETWORKS = {
             AdNetworkType.ADMOB,
@@ -182,11 +187,11 @@ public class AppConfig {
     /* ----- Value below is unit id for ad networks, the name is pretty clear for unit ID  ------*/
 
     /* Ad unit for ADMOB */
-    public static String AD_ADMOB_PUBLISHER_ID = "pub-4553889194429284";
-    public static String AD_ADMOB_BANNER_UNIT_ID = "ca-app-pub-4553889194429284/6870051716";
-    public static String AD_ADMOB_INTERSTITIAL_UNIT_ID = "ca-app-pub-4553889194429284/6860907882";
-    public static String AD_ADMOB_REWARDED_UNIT_ID = "ca-app-pub-4553889194429284/4361052848";
-    public static String AD_ADMOB_OPEN_APP_UNIT_ID = "ca-app-pub-4553889194429284/2659343964";
+    public static String AD_ADMOB_PUBLISHER_ID = "pub-3940256099942544";
+    public static String AD_ADMOB_BANNER_UNIT_ID = "ca-app-pub-3940256099942544/9214589741";
+    public static String AD_ADMOB_INTERSTITIAL_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
+    public static String AD_ADMOB_REWARDED_UNIT_ID = "ca-app-pub-3940256099942544/5354046379";
+    public static String AD_ADMOB_OPEN_APP_UNIT_ID = "ca-app-pub-3940256099942544/9257395921";
 
     /* Ad unit for Google Ad Manager */
     public static String AD_MANAGER_BANNER_UNIT_ID = "/6499/example/banner";
@@ -204,32 +209,5 @@ public class AppConfig {
     public static String AD_IRONSOURCE_BANNER_UNIT_ID = "DefaultBanner";
     public static String AD_IRONSOURCE_REWARDED_UNIT_ID = "DefaultRewardedVideo";
     public static String AD_IRONSOURCE_INTERSTITIAL_UNIT_ID = "DefaultInterstitial";
-
-    /* Ad unit for UNITY */
-    public static String AD_UNITY_GAME_ID = "4988568";
-    public static String AD_UNITY_BANNER_UNIT_ID = "Banner_Android";
-    public static String AD_UNITY_REWARDED_UNIT_ID = "Rewarded_Android";
-    public static String AD_UNITY_INTERSTITIAL_UNIT_ID = "Interstitial_Android";
-
-    /* Ad unit for APPLOVIN MAX */
-    public static String AD_APPLOVIN_BANNER_UNIT_ID = "a3a3a5b44c763304";
-    public static String AD_APPLOVIN_INTERSTITIAL_UNIT_ID = "35f9c01af124fcb9";
-    public static String AD_APPLOVIN_REWARDED_UNIT_ID = "21dba76a66f7c9fe";
-    public static String AD_APPLOVIN_OPEN_APP_UNIT_ID = "7c3fcecd43d3f90c";
-
-    /* Ad unit for APPLOVIN DISCOVERY */
-    public static String AD_APPLOVIN_BANNER_ZONE_ID = "df40a31072feccab";
-    public static String AD_APPLOVIN_INTERSTITIAL_ZONE_ID = "d0eea040d4bd561e";
-    public static String AD_APPLOVIN_REWARDED_ZONE_ID = "5d799aeefef733a1";
-
-    /* Ad unit for STARTAPP */
-    public static String AD_STARTAPP_APP_ID = "0";
-
-    /* Ad unit for WORTISE */
-    public static String AD_WORTISE_APP_ID = "test-app-id";
-    public static String AD_WORTISE_BANNER_UNIT_ID = "test-banner";
-    public static String AD_WORTISE_INTERSTITIAL_UNIT_ID = "test-interstitial";
-    public static String AD_WORTISE_REWARDED_UNIT_ID = "test-rewarded";
-    public static String AD_WORTISE_OPEN_APP_UNIT_ID = "test-app-open";
 
 }

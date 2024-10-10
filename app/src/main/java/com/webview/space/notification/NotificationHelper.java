@@ -1,13 +1,17 @@
 package com.webview.space.notification;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.onesignal.debug.LogLevel;
+import com.onesignal.notifications.INotification;
 import com.webview.space.AppConfig;
 import com.webview.space.BuildConfig;
+import com.webview.space.R;
 import com.webview.space.activity.ActivityMain;
-import com.onesignal.OSNotification;
 import com.onesignal.OneSignal;
 
 import org.json.JSONException;
@@ -21,13 +25,12 @@ public class NotificationHelper {
 
     public static void oneSignalInit(Context context) {
         if (BuildConfig.DEBUG) {
-            OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
+            OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
         }
 
         // init one signal with client data
-        OneSignal.initWithContext(context);
-        OneSignal.setAppId(AppConfig.ONE_SIGNAL_APP_ID);
-        OneSignal.sendTag("APP", "WEBVIEW APP");
+        OneSignal.initWithContext(context, AppConfig.ONE_SIGNAL_APP_ID);
+        OneSignal.getUser().addTag("APP", context.getResources().getString(R.string.app_name));
 
         // handle when use click notification
         onOneSignalOpenNotification(context);
@@ -35,22 +38,21 @@ public class NotificationHelper {
     }
 
     public static void onOneSignalOpenNotification(Context context) {
-        OneSignal.setNotificationOpenedHandler(result -> {
-            OSNotification notification = result.getNotification();
+        OneSignal.getNotifications().addClickListener(iNotificationClickEvent -> {
+            INotification iNotification = iNotificationClickEvent.getNotification();
+            JSONObject additionalData = iNotification.getAdditionalData();
+            if(additionalData != null){
+                try {
+                    String url = null;
+                    String title = null;
 
-            try {
-                String url = null;
-                String title = null;
+                    // notification data
+                    String launchURL = iNotification.getLaunchURL();
 
-                // notification data
-                String launchURL = notification.getLaunchURL();
-                JSONObject additionalData = notification.getAdditionalData();
+                    // get launch url
+                    if (launchURL != null) url = launchURL;
 
-                // get launch url
-                if (launchURL != null) url = launchURL;
-
-                // get url from additional data
-                if (additionalData != null) {
+                    // get url from additional data
                     if (additionalData.has("url")) {
                         url = additionalData.getString("url");
                     } else if (additionalData.has("URL")){
@@ -58,25 +60,24 @@ public class NotificationHelper {
                     }  else if (additionalData.has("launchURL")) {
                         url = additionalData.getString("launchURL");
                     }
-                }
-                if (!TextUtils.isEmpty(notification.getTitle())) {
-                    title = notification.getTitle();
-                }
+                    if (!TextUtils.isEmpty(iNotification.getTitle())) {
+                        title = iNotification.getTitle();
+                    }
 
-                // start activity
-                Intent intent;
-                if (TextUtils.isEmpty(url)) {
-                    intent = ActivityMain.navigate(context);
-                } else {
-                    intent = ActivityMain.navigate(context, title, url);
-                }
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                    // start activity
+                    Intent intent;
+                    if (TextUtils.isEmpty(url)) {
+                        intent = ActivityMain.navigate(context);
+                    } else {
+                        intent = ActivityMain.navigate(context, title, url);
+                    }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-
         });
 
     }

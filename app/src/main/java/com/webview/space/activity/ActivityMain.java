@@ -42,6 +42,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.webview.space.AppConfig;
 import com.webview.space.R;
 import com.webview.space.advertise.AdNetworkHelper;
@@ -53,6 +54,7 @@ import com.webview.space.model.LoadingMode;
 import com.webview.space.utils.PermissionManager;
 import com.webview.space.utils.PermissionRationaleHandler;
 import com.webview.space.utils.PermissionUtil;
+import com.webview.space.utils.RemoteConfigHelper;
 import com.webview.space.utils.Tools;
 import com.webview.space.webview.AdvancedWebView;
 import com.webview.space.webview.VideoEnabledWebChromeClient;
@@ -105,7 +107,6 @@ public class ActivityMain extends AppCompatActivity {
         initComponent();
         initToolbar();
         setupNavigationDrawer();
-        prepareAds();
 
         // load default menu page
         DrawerMenuItem firstMenu = menuMap.get(AppConfig.DEFAULT_MENU_ID);
@@ -457,6 +458,7 @@ public class ActivityMain extends AppCompatActivity {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         Tools.checkGooglePlayUpdate(this);
+        requestRemoteConfig();
     }
 
     @Override
@@ -478,6 +480,24 @@ public class ActivityMain extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    private void requestRemoteConfig() {
+        RemoteConfigHelper.getInstance().fetch(new RemoteConfigHelper.Listener() {
+            @Override
+            public void onDisable() {
+                prepareAds();
+            }
+
+            @Override
+            public void onComplete(boolean success, FirebaseRemoteConfig firebaseRemoteConfig) {
+                super.onComplete(success, firebaseRemoteConfig);
+                if(success){
+                    AppConfig.setFromRemoteConfig(firebaseRemoteConfig);
+                }
+                prepareAds();
+            }
+        });
     }
 
     private class CustomWebViewClient extends WebViewClient {
@@ -556,6 +576,7 @@ public class ActivityMain extends AppCompatActivity {
 
     private void prepareAds() {
         adNetworkHelper = new AdNetworkHelper(this);
+        adNetworkHelper.init();
         adNetworkHelper.updateConsentStatus();
         if (AppConfig.SHOW_UMP) adNetworkHelper.loadShowUMPConsentForm();
         adNetworkHelper.loadBannerAd(AppConfig.ENABLE_BANNER);

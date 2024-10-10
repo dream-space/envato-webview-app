@@ -11,9 +11,11 @@ import android.os.Handler;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.webview.space.AppConfig;
 import com.webview.space.advertise.AdNetworkHelper;
 import com.webview.space.databinding.ActivitySplashBinding;
+import com.webview.space.utils.RemoteConfigHelper;
 
 public class ActivitySplash extends AppCompatActivity {
 
@@ -44,24 +46,46 @@ public class ActivitySplash extends AppCompatActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                startActivityMain();
+                requestRemoteConfig();
             }
         });
         // start
         mAnimatorSet.start();
     }
 
-    private void startActivityMain() {
+    private void requestRemoteConfig() {
+        RemoteConfigHelper.getInstance().fetch(new RemoteConfigHelper.Listener() {
+            @Override
+            public void onDisable() {
+                startActivityDelay(false);
+            }
+
+            @Override
+            public void onComplete(boolean success, FirebaseRemoteConfig firebaseRemoteConfig) {
+                super.onComplete(success, firebaseRemoteConfig);
+                if(success){
+                    AppConfig.setFromRemoteConfig(firebaseRemoteConfig);
+                }
+                startActivityDelay(true);
+            }
+        });
+    }
+
+    private void startActivityDelay(boolean fast) {
         // init ads
         AdNetworkHelper adNetworkHelper = new AdNetworkHelper(this);
         adNetworkHelper.init();
         // init open ads for admob
         adNetworkHelper.loadAndShowOpenAppAd(this, AppConfig.ENABLE_SPLASH_OPEN_APP, () -> {
             new Handler(getMainLooper()).postDelayed(() -> {
-                Intent i = new Intent(ActivitySplash.this, ActivityMain.class);
-                startActivity(i);
-                finish();
-            }, 1000);
+                startActivityMain();
+            }, fast ? 500 : 1000);
         });
+    }
+
+    private void startActivityMain() {
+        Intent i = new Intent(ActivitySplash.this, ActivityMain.class);
+        startActivity(i);
+        finish();
     }
 }
