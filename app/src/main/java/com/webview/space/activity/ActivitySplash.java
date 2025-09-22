@@ -7,19 +7,25 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.webview.space.AppConfig;
+import com.webview.space.R;
 import com.webview.space.advertise.AdNetworkHelper;
 import com.webview.space.databinding.ActivitySplashBinding;
 import com.webview.space.utils.RemoteConfigHelper;
+import com.webview.space.utils.Tools;
 
 public class ActivitySplash extends AppCompatActivity {
 
     private ActivitySplashBinding binding;
+
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,22 @@ public class ActivitySplash extends AppCompatActivity {
     }
 
     private void requestRemoteConfig() {
+        boolean connectToInternet = Tools.cekConnection(this);
+        if (!connectToInternet) {
+            dialogFailedRemoteConfig(getString(R.string.message_failed_config));
+            return;
+        }
+        new Handler(this.getMainLooper()).postDelayed(() -> {
+            try {
+                if (!ActivitySplash.active && (alertDialog == null || !alertDialog.isShowing())) {
+                    Log.d("REMOTE_CONFIG", "Reach limit request time");
+                    dialogFailedRemoteConfig(getString(R.string.message_failed_config));
+                }
+            } catch (Exception e) {
+
+            }
+        }, 10000);
+
         RemoteConfigHelper.getInstance().fetch(new RemoteConfigHelper.Listener() {
             @Override
             public void onDisable() {
@@ -87,5 +109,32 @@ public class ActivitySplash extends AppCompatActivity {
         Intent i = new Intent(ActivitySplash.this, ActivityMain.class);
         startActivity(i);
         finish();
+    }
+
+    public void dialogFailedRemoteConfig(String message) {
+        if (alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.failed);
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setPositiveButton(R.string.RETRY, (dialog, which) -> {
+            dialog.dismiss();
+            requestRemoteConfig();
+        });
+        alertDialog = builder.show();
+    }
+
+    static boolean active = false;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        active = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        active = false;
     }
 }

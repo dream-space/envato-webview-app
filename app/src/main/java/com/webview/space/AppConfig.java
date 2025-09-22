@@ -105,7 +105,9 @@ public class AppConfig extends AppConfigExt {
             ".*zip$", ".*rar$", ".*pdf$",
             ".*mp3$", ".*wav$",
             ".*mp4$", ".*mpg$",
+            ".*png$", ".*jpg$",
             ".*drive.google.com.*file.*",
+            ".*skins.hostprostudio.com.*file-entries.*"
     };
 
     /* true for open link in external browser, no inside app */
@@ -179,9 +181,9 @@ public class AppConfig extends AppConfigExt {
      * ADMOB, MANAGER, FAN, IRONSOURCE
      * */
     public static AdNetworkType[] AD_NETWORKS = {
+            AdNetworkType.IRONSOURCE,
             AdNetworkType.ADMOB,
             AdNetworkType.FAN,
-            AdNetworkType.IRONSOURCE,
     };
 
     /* ----- Value below is unit id for ad networks, the name is pretty clear for unit ID  ------*/

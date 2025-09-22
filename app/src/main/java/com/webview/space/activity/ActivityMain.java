@@ -172,6 +172,7 @@ public class ActivityMain extends AppCompatActivity {
         binding.mainWebView.getSettings().setGeolocationEnabled(true);
         binding.mainWebView.getSettings().setSupportZoom(true);
         binding.mainWebView.getSettings().setBuiltInZoomControls(false);
+        binding.mainWebView.getSettings().setUseWideViewPort(true);
         // user agent
         if (AppConfig.WEB_USER_AGENT != null && !AppConfig.WEB_USER_AGENT.equals("")) {
             binding.mainWebView.getSettings().setUserAgentString(AppConfig.WEB_USER_AGENT);

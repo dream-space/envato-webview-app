@@ -28,6 +28,8 @@ public class OneSignalServiceExtension implements INotificationServiceExtension 
                 // you can modify your action buttons here
             }
         }
+        
+        saveToDatabase(context, notification);
 
         // this is an example of how to modify the notification by changing the background color to blue
         NotificationCompat.Extender extender = new NotificationCompat.Extender() {
