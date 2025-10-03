@@ -45,7 +45,7 @@ public class AppConfig extends AppConfigExt {
     /* List of bottom drawer menu, This list menu will show at the bottom drawer menu */
     public static DrawerMenuItem[] DRAWER_SUBMENU = {
             new DrawerMenuItem(600, R.drawable.ic_notifications, "Notification", ActivityNotification.class),
-            new DrawerMenuItem(700, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/developer?id=Dream+Space"),
+            new DrawerMenuItem(700, R.drawable.ic_home, "Rate App", "https://play.google.com/store/apps/details?id=com.webview.space"),
             new DrawerMenuItem(800, R.drawable.ic_privacy, "Privacy", "https://dream-space.web.id/privacy-policy"),
             new DrawerMenuItem(900, R.drawable.ic_about, "About", "file:///android_asset/about.html")
     };
@@ -93,7 +93,7 @@ public class AppConfig extends AppConfigExt {
     // web and links -------------------------------------------------------------------------------
     /* set user agent for the web view,
     * leave this value empty if you do not want to set user agent */
-    public static String WEB_USER_AGENT = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
+    public static String WEB_USER_AGENT = "";
 
     /* true for enabling web geolocation */
     public static boolean WEB_GEOLOCATION = true;

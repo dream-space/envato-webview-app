@@ -13,6 +13,11 @@ public class AppConfigExt {
     /* --------------- DONE EDIT CODE BELOW ------------------------------------------------------ */
 
     public static void setFromRemoteConfig(FirebaseRemoteConfig remote) {
+
+        if (!remote.getString("WEB_USER_AGENT").isEmpty()) {
+            AppConfig.WEB_USER_AGENT = remote.getString("WEB_USER_AGENT");
+        }
+
         /* notification configuration */
 
         if (!remote.getString("ONE_SIGNAL_APP_ID").isEmpty()) {

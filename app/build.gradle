@@ -11,8 +11,8 @@ android {
         applicationId "com.webview.space"
         minSdk 23
         targetSdk 36
-        versionCode 140
-        versionName "1.4"
+        versionCode 142
+        versionName "1.4.2"
         multiDexEnabled true
     }
 
@@ -27,8 +27,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
@@ -51,20 +51,19 @@ dependencies {
     implementation 'com.onesignal:OneSignal:[5.1.37, 5.99.99]'
 
     // room database
-    implementation 'androidx.room:room-runtime:2.8.0'
-    annotationProcessor 'androidx.room:room-compiler:2.8.0'
+    implementation 'androidx.room:room-runtime:2.8.1'
+    implementation 'androidx.activity:activity:1.11.0'
+    annotationProcessor 'androidx.room:room-compiler:2.8.1'
 
     // glide image loader
     implementation 'com.github.bumptech.glide:glide:5.0.5'
     annotationProcessor 'com.github.bumptech.glide:compiler:5.0.5'
 
     // AD NETWORKS OPTIONS :
-    // 4.0.10-all = Uses AdMob, Google Ad Manager, Meta Audience Network, IronSource
-    // 4.0.10-admob-fan = Uses Admob, Google Ad Manager and Meta Audience Network
-    // 4.0.10-admob-is = Uses Admob, Google Ad Manager and IronSource
-    // 4.0.10-admob-only = Uses Admob and Google Ad Manager  Only
-    // 4.0.10-fan-only = Uses  Meta Audience Network Only
-    // 4.0.10-is-only = Uses IronSource Only
-    // 4.0.10-none = Doesn't use any ads
-    implementation 'com.github.dream-space:dreamspace-ads-sdk:4.0.10-all'
+    // 4.0.13-all = Uses AdMob, Google Ad Manager, Meta Audience Network, IronSource
+    // 4.0.13-admob-is = Uses Admob, Google Ad Manager and IronSource
+    // 4.0.13-admob-only = Uses Admob and Google Ad Manager  Only
+    // 4.0.13-none = Doesn't use any ads
+    implementation project(':library-ads')
+    // implementation 'com.github.dream-space:dreamspace-ads-sdk:4.0.13-all'
 }
