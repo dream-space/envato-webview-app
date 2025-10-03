@@ -182,8 +182,7 @@ public class AppConfig extends AppConfigExt {
      * */
     public static AdNetworkType[] AD_NETWORKS = {
             AdNetworkType.IRONSOURCE,
-            AdNetworkType.ADMOB,
-            AdNetworkType.FAN,
+            AdNetworkType.ADMOB
     };
 
     /* ----- Value below is unit id for ad networks, the name is pretty clear for unit ID  ------*/

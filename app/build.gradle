@@ -11,8 +11,8 @@ android {
         applicationId "com.webview.space"
         minSdk 23
         targetSdk 36
-        versionCode 142
-        versionName "1.4.2"
+        versionCode 143
+        versionName "1.4.3"
         multiDexEnabled true
     }
 
@@ -60,10 +60,9 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:5.0.5'
 
     // AD NETWORKS OPTIONS :
-    // 4.0.13-all = Uses AdMob, Google Ad Manager, Meta Audience Network, IronSource
-    // 4.0.13-admob-is = Uses Admob, Google Ad Manager and IronSource
-    // 4.0.13-admob-only = Uses Admob and Google Ad Manager  Only
-    // 4.0.13-none = Doesn't use any ads
-    implementation project(':library-ads')
-    // implementation 'com.github.dream-space:dreamspace-ads-sdk:4.0.13-all'
+    // 4.0.10-all = Uses AdMob, Google Ad Manager, Meta Audience Network, IronSource
+    // 4.0.10-admob-is = Uses Admob, Google Ad Manager and IronSource
+    // 4.0.10-admob-only = Uses Admob and Google Ad Manager  Only
+    // 4.0.10-none = Doesn't use any ads
+    implementation 'com.github.dream-space:dreamspace-ads-sdk:4.0.10-admob-is'
 }
